@@ -1,0 +1,12 @@
+version: 1.0
+name: ipmi
+debug: true
+network:
+  type: unix
+  address: ipmi.sock
+settings:
+  mode: parallel
+  read:
+    interval: 3s
+  write:
+    interval: 1s

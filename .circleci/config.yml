@@ -1,0 +1,146 @@
+version: 2
+jobs:
+
+  # Build and test the IPMI plugin.
+  build:
+    working_directory: /go/src/github.com/vapor-ware/synse-ipmi-plugin
+    docker:
+      - image: circleci/golang:latest
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - ipmi-vendor-{{ checksum "Gopkg.toml" }}-{{ checksum "Gopkg.lock" }}
+            - ipmi-vendor-{{ checksum "Gopkg.toml" }}
+      - run:
+          name: Install Vendored Dependencies
+          command: |
+            make dep
+      - run:
+          name: Lint
+          command: |
+            make lint
+      - run:
+          name: Format
+          command: |
+            fmt="$(find . -name '*.go' -not -wholename './vendor/*' | while read -r file; do goimports -d "$file"; done)"
+            if [ "$fmt" != "" ]; then
+              echo "$fmt"
+              exit 1
+            fi
+      - run:
+          name: Build Binary
+          command: |
+            make build
+      - setup_remote_docker
+      - run:
+          name: Build Docker Image
+          command: |
+            make docker
+      - save_cache:
+          when: on_success
+          key: ipmi-vendor-{{ checksum "Gopkg.toml" }}-{{ checksum "Gopkg.lock" }}
+          paths:
+            - vendor/
+
+  # Build and push the image to DockerHub.
+  push:
+    working_directory: /go/src/github.com/vapor-ware/synse-ipmi-plugin
+    docker:
+      - image: docker:17.11.0-ce-git
+    environment:
+      - GOPATH: /go
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Install Dependencies
+          command: |
+            apk add --update --no-cache go musl-dev make
+            go get -v github.com/golang/dep/cmd/dep
+            go install github.com/golang/dep/cmd/dep
+            /go/bin/dep ensure -v
+      - run:
+          name: Build Docker Image
+          command: |
+            make docker
+      - deploy:
+          name: Push to DockerHub
+          command: |
+            docker login -u $DOCKER_USER -p $DOCKER_PASS
+            version=$(make version)
+            docker push vaporio/ipmi-plugin:latest
+            docker push vaporio/ipmi-plugin:$version
+
+  # Create a GitHub release draft for the pushed tag.
+  release:
+    working_directory: /go/src/github.com/vapor-ware/synse-ipmi-plugin
+    docker:
+      - image: circleci/golang:latest
+    steps:
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - checkout
+      - run:
+          name: Check Version matches Tag
+          command: |
+            version=$(make version)
+            if [ "${version}" != "${CIRCLE_TAG}" ]; then
+              echo "Version ${version} does not match Tag ${CIRCLE_TAG}"
+              exit 1
+            fi
+      - run:
+          name: Install Vendored Dependencies
+          command: |
+            make dep
+      - run:
+          name: Get Builder and Distributor
+          command: |
+            go get -v github.com/mitchellh/gox
+            go get -v github.com/tcnksm/ghr
+      - run:
+          name: Building Artifacts
+          command: |
+            gox --output="build/ipmi_{{.OS}}_{{.Arch}}" -osarch='!darwin/386 !darwin/arm !darwin/arm64' -os='darwin linux'
+      - run:
+          name: Generate Changelog
+          command: |
+            docker pull timfallmk/github-changelog-generator
+            docker run --name changelog timfallmk/github-changelog-generator \
+              -u vapor-ware \
+              -p synse-ipmi-plugin \
+              --since-tag $(git describe --abbrev=0 --tags `git rev-list --tags --skip=1 --max-count=1`) \
+              -t ${GITHUB_TOKEN}
+            docker cp changelog:/usr/local/src/your-app/CHANGELOG.md ./
+      - run:
+          name: Create Release
+          command: |
+            if git describe --exact-match --tags HEAD; then
+              CIRCLE_TAG=$(git describe --exact-match --tags HEAD)
+            fi
+            ghr \
+              -u ${GITHUB_USER} \
+              -t ${GITHUB_TOKEN} \
+              -b "$(cat ./CHANGELOG.md)" \
+              -replace \
+              -draft \
+              ${CIRCLE_TAG} build/
+workflows:
+  version: 2
+  build:
+    jobs:
+      - build
+      # FIXME (etd) - temporarily disabling push, since the plugin is still
+      # under development and will not work.
+      #- push:
+      #    requires:
+      #      - build
+      #    filters:
+      #      branches:
+      #        only: master
+      - release:
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^[0-9]*(\.[0-9]*)*$/
