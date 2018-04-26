@@ -3,6 +3,8 @@ package main
 import (
 	"log"
 
+	"github.com/vapor-ware/synse-ipmi-plugin/devices"
+	"github.com/vapor-ware/synse-ipmi-plugin/enumerate"
 	"github.com/vapor-ware/synse-sdk/sdk"
 )
 
@@ -25,7 +27,7 @@ func DeviceIdentifier(data map[string]string) string {
 
 func main() {
 
-	handlers, err := sdk.NewHandlers(DeviceIdentifier, nil)
+	handlers, err := sdk.NewHandlers(DeviceIdentifier, enumerate.DeviceEnumerator)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -34,6 +36,10 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	plugin.RegisterDeviceHandlers(
+		&devices.BmcPower,
+	)
 
 	// Set build-time version info.
 	plugin.SetVersion(sdk.VersionInfo{
