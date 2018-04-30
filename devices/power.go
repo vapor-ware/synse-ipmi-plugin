@@ -20,59 +20,21 @@ var BmcPower = sdk.DeviceHandler{
 
 func bmcPowerRead(device *sdk.Device) ([]*sdk.Reading, error) {
 
-	conn, err := protocol.MakeConnection(device.Data)
+	state, err := protocol.GetChassisPowerState(device.Data)
 	if err != nil {
 		return nil, err
 	}
 
-	client, err := ipmi.NewClient(conn)
-	if err != nil {
-		return nil, err
-	}
-
-	ipmiReq := &ipmi.Request{
-		NetworkFunction: ipmi.NetworkFunctionChassis,
-		Command:         ipmi.CommandChassisStatus,
-		Data:            &ipmi.ChassisStatusRequest{},
-	}
-	ipmiRes := &ipmi.ChassisStatusResponse{}
-
-	err = client.Send(ipmiReq, ipmiRes)
-	if err != nil {
-		return nil, err
-	}
-
-	var state string
-	switch ipmiRes.PowerState {
-	case 0:
-		state = "off"
-	case 1:
-		state = "on"
-	default:
-		return nil, fmt.Errorf("unknown power state response: %v", ipmiRes.PowerState)
-	}
-
-	ret := []*sdk.Reading{
+	readings := []*sdk.Reading{
 		sdk.NewReading("state", state),
 	}
-
-	return ret, nil
+	return readings, nil
 }
 
 func bmcPowerWrite(device *sdk.Device, data *sdk.WriteData) error {
 
 	action := data.Action
 	raw := data.Raw
-
-	conn, err := protocol.MakeConnection(device.Data)
-	if err != nil {
-		return err
-	}
-
-	client, err := ipmi.NewClient(conn)
-	if err != nil {
-		return err
-	}
 
 	// When writing to a BMC Power device, we always expect there to be
 	// raw data specified. If there isn't, we return an error.
@@ -97,7 +59,7 @@ func bmcPowerWrite(device *sdk.Device, data *sdk.WriteData) error {
 			return fmt.Errorf("unsupported command for bmc power 'state' action: %s", cmd)
 		}
 
-		err = client.Control(state)
+		err := protocol.SetChassisPowerState(device.Data, state)
 		if err != nil {
 			return err
 		}

@@ -21,39 +21,13 @@ var BmcBootTarget = sdk.DeviceHandler{
 
 func bmcBootTargetRead(device *sdk.Device) ([]*sdk.Reading, error) {
 
-	conn, err := protocol.MakeConnection(device.Data)
+	target, err := protocol.GetChassisBootTarget(device.Data)
 	if err != nil {
 		return nil, err
 	}
-
-	client, err := ipmi.NewClient(conn)
-	if err != nil {
-		return nil, err
-	}
-
-	ipmiReq := &ipmi.Request{
-		NetworkFunction: ipmi.NetworkFunctionChassis,
-		Command:         ipmi.CommandGetSystemBootOptions,
-		Data: &ipmi.SystemBootOptionsRequest{
-			Param: ipmi.BootParamBootFlags,
-		},
-	}
-
-	ipmiRes := &ipmi.SystemBootOptionsResponse{}
-
-	err = client.Send(ipmiReq, ipmiRes)
-	if err != nil {
-		return nil, err
-	}
-
-	// As per Section 28.13 Get System Boot Options, Table 28-, Boot Option Parameters,
-	// index 1 of the configuration data holds the service partition selector, i.e.
-	// the boot target.
-	target := ipmi.BootDevice(ipmiRes.Data[1])
-
 
 	ret := []*sdk.Reading{
-		sdk.NewReading("target", target.String()),
+		sdk.NewReading("target", target),
 	}
 
 	return ret, nil
@@ -63,16 +37,6 @@ func bmcBootTargetWrite(device *sdk.Device, data *sdk.WriteData) error {
 
 	action := data.Action
 	raw := data.Raw
-
-	conn, err := protocol.MakeConnection(device.Data)
-	if err != nil {
-		return err
-	}
-
-	client, err := ipmi.NewClient(conn)
-	if err != nil {
-		return err
-	}
 
 	// When writing to a BMC Power device, we always expect there to be
 	// raw data specified. If there isn't, we return an error.
@@ -126,7 +90,7 @@ func bmcBootTargetWrite(device *sdk.Device, data *sdk.WriteData) error {
 			return fmt.Errorf("unsupported command for bmc boot target 'target' action: %s", cmd)
 		}
 
-		err := client.SetBootDevice(target)
+		err := protocol.SetChassisBootTarget(device.Data, target)
 		if err != nil {
 			return err
 		}

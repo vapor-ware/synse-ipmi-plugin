@@ -7,7 +7,17 @@ import (
 	"github.com/vmware/goipmi"
 )
 
-func MakeConnection(data map[string]string) (*ipmi.Connection, error) {
+
+func newClientFromConfig(config map[string]string) (*ipmi.Client, error) {
+	conn, err := makeConnection(config)
+	if err != nil {
+		return nil, err
+	}
+	return ipmi.NewClient(conn)
+}
+
+
+func makeConnection(data map[string]string) (*ipmi.Connection, error) {
 	// FIXME (etd): need to do some type casting because the device
 	// data is a map[string]string, but we need some values as ints
 	var tmp = make(map[string]interface{})
