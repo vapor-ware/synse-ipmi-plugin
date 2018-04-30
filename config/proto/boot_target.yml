@@ -1,0 +1,8 @@
+version: 1.0
+prototypes:
+  - type: boot_target
+    model: bmc-boot-target
+    manufacturer: Vapor IO
+    protocol: ipmi
+    output:
+      - type: target

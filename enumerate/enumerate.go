@@ -1,11 +1,12 @@
 package enumerate
 
 import (
+	"strconv"
+
 	"github.com/mitchellh/mapstructure"
 	"github.com/vapor-ware/synse-sdk/sdk/config"
 	"github.com/vapor-ware/synse-sdk/sdk/logger"
 	"github.com/vmware/goipmi"
-	"strconv"
 )
 
 // FIXME (etd): the SDK needs some improvements to how dynamic device
@@ -56,6 +57,24 @@ func DeviceEnumerator(data map[string]interface{}) ([]*config.DeviceConfig, erro
 	devices = append(devices, &power)
 
 	// Make new boot target device for the BMC (todo)
+	bootTarget := config.DeviceConfig{
+		Version: "1",
+		Type:    "boot_target",
+		Model:   "bmc-boot-target",
+		Location: config.Location{
+			Rack:  "ipmi",
+			Board: conn.Hostname,
+		},
+		Data: map[string]string{
+			"path":      conn.Path,
+			"hostname":  conn.Hostname,
+			"port":      strconv.Itoa(conn.Port),
+			"username":  conn.Username,
+			"password":  conn.Password,
+			"interface": conn.Interface,
+		},
+	}
+	devices = append(devices, &bootTarget)
 
 	// Make new identify device for the BMC (todo)
 

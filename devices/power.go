@@ -1,13 +1,12 @@
 package devices
 
 import (
-	"github.com/mitchellh/mapstructure"
-	"github.com/vapor-ware/synse-sdk/sdk"
-	"github.com/vapor-ware/synse-sdk/sdk/logger"
-	"github.com/vmware/goipmi"
-	"strconv"
 	"fmt"
 	"strings"
+
+	"github.com/vapor-ware/synse-ipmi-plugin/protocol"
+	"github.com/vapor-ware/synse-sdk/sdk"
+	"github.com/vmware/goipmi"
 )
 
 // BmcPower is the handler for the bmc-power device.
@@ -15,43 +14,16 @@ var BmcPower = sdk.DeviceHandler{
 	Type:  "power",
 	Model: "bmc-power",
 
-	Read: bmcPowerRead,
+	Read:  bmcPowerRead,
 	Write: bmcPowerWrite,
 }
 
-
-func makeConnection(data map[string]string) (*ipmi.Connection, error) {
-	// FIXME (etd): need to do some type casting because the device
-	// data is a map[string]string, but we need some values as ints
-	var tmp = make(map[string]interface{})
-	for k, v := range data {
-		tmp[k] = v
-	}
-
-	port, err := strconv.Atoi(data["port"])
-	if err != nil {
-		return nil, err
-	}
-	tmp["port"] = port
-
-	conn := &ipmi.Connection{}
-	err = mapstructure.Decode(tmp, conn)
-	if err != nil {
-		return nil, err
-	}
-
-	return conn, nil
-}
-
-
 func bmcPowerRead(device *sdk.Device) ([]*sdk.Reading, error) {
 
-	conn, err := makeConnection(device.Data)
+	conn, err := protocol.MakeConnection(device.Data)
 	if err != nil {
 		return nil, err
 	}
-
-	logger.Infof("bmcPowerRead Conn: %+v", conn)
 
 	client, err := ipmi.NewClient(conn)
 	if err != nil {
@@ -70,9 +42,6 @@ func bmcPowerRead(device *sdk.Device) ([]*sdk.Reading, error) {
 		return nil, err
 	}
 
-	logger.Infof("IPMI power response state: %+v", ipmiRes.State)
-	logger.Infof("IPMI power response powerState: %+v", ipmiRes.PowerState)
-
 	var state string
 	switch ipmiRes.PowerState {
 	case 0:
@@ -90,13 +59,12 @@ func bmcPowerRead(device *sdk.Device) ([]*sdk.Reading, error) {
 	return ret, nil
 }
 
-
 func bmcPowerWrite(device *sdk.Device, data *sdk.WriteData) error {
 
 	action := data.Action
 	raw := data.Raw
 
-	conn, err := makeConnection(device.Data)
+	conn, err := protocol.MakeConnection(device.Data)
 	if err != nil {
 		return err
 	}

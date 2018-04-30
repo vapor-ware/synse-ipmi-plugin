@@ -39,6 +39,7 @@ func main() {
 
 	plugin.RegisterDeviceHandlers(
 		&devices.BmcPower,
+		&devices.BmcBootTarget,
 	)
 
 	// Set build-time version info.
