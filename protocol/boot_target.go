@@ -10,7 +10,7 @@ func GetChassisBootTarget(config map[string]string) (string, error) {
 
 	request := &ipmi.Request{
 		NetworkFunction: ipmi.NetworkFunctionChassis,
-		Command: ipmi.CommandGetSystemBootOptions,
+		Command:         ipmi.CommandGetSystemBootOptions,
 		Data: &ipmi.SystemBootOptionsRequest{
 			Param: ipmi.BootParamBootFlags,
 		},

@@ -7,7 +7,6 @@ import (
 	"github.com/vmware/goipmi"
 )
 
-
 func newClientFromConfig(config map[string]string) (*ipmi.Client, error) {
 	conn, err := makeConnection(config)
 	if err != nil {
@@ -15,7 +14,6 @@ func newClientFromConfig(config map[string]string) (*ipmi.Client, error) {
 	}
 	return ipmi.NewClient(conn)
 }
-
 
 func makeConnection(data map[string]string) (*ipmi.Connection, error) {
 	// FIXME (etd): need to do some type casting because the device

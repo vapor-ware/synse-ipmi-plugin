@@ -22,7 +22,7 @@ var (
 //
 // FIXME - this is just a stub for framing up the plugin
 func DeviceIdentifier(data map[string]string) string {
-	return ""
+	return data["id"]
 }
 
 func main() {
@@ -40,6 +40,7 @@ func main() {
 	plugin.RegisterDeviceHandlers(
 		&devices.BmcPower,
 		&devices.BmcBootTarget,
+		//&devices.BmcChassisLed, // FIXME (etd) - temporarily disabled as this is unhappy with the emulator...
 	)
 
 	// Set build-time version info.

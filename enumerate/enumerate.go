@@ -46,6 +46,7 @@ func DeviceEnumerator(data map[string]interface{}) ([]*config.DeviceConfig, erro
 		// We can put the connection info here.. sorta (needs to be string->interface{},
 		// or interface{}->interface{}
 		Data: map[string]string{
+			"id": 		 "1", // FIXME (etd) - is there anything unique that we can use instead of hardcoding? if not, find a better way than manually specifying ids...
 			"path":      conn.Path,
 			"hostname":  conn.Hostname,
 			"port":      strconv.Itoa(conn.Port),
@@ -66,6 +67,7 @@ func DeviceEnumerator(data map[string]interface{}) ([]*config.DeviceConfig, erro
 			Board: conn.Hostname,
 		},
 		Data: map[string]string{
+			"id":		 "2",
 			"path":      conn.Path,
 			"hostname":  conn.Hostname,
 			"port":      strconv.Itoa(conn.Port),
@@ -77,6 +79,25 @@ func DeviceEnumerator(data map[string]interface{}) ([]*config.DeviceConfig, erro
 	devices = append(devices, &bootTarget)
 
 	// Make new identify device for the BMC (todo)
+	identifyLed := config.DeviceConfig{
+		Version: "1",
+		Type:    "led",
+		Model:   "bmc-chassis-led",
+		Location: config.Location{
+			Rack:  "ipmi",
+			Board: conn.Hostname,
+		},
+		Data: map[string]string{
+			"id":		 "3",
+			"path":      conn.Path,
+			"hostname":  conn.Hostname,
+			"port":      strconv.Itoa(conn.Port),
+			"username":  conn.Username,
+			"password":  conn.Password,
+			"interface": conn.Interface,
+		},
+	}
+	devices = append(devices, &identifyLed)
 
 	return devices, nil
 }

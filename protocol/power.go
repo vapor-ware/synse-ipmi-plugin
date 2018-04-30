@@ -1,10 +1,10 @@
 package protocol
 
 import (
-	"github.com/vmware/goipmi"
 	"fmt"
-)
 
+	"github.com/vmware/goipmi"
+)
 
 func GetChassisPowerState(config map[string]string) (string, error) {
 	client, err := newClientFromConfig(config)
@@ -14,8 +14,8 @@ func GetChassisPowerState(config map[string]string) (string, error) {
 
 	request := &ipmi.Request{
 		NetworkFunction: ipmi.NetworkFunctionChassis,
-		Command: ipmi.CommandChassisStatus,
-		Data: &ipmi.ChassisStatusRequest{},
+		Command:         ipmi.CommandChassisStatus,
+		Data:            &ipmi.ChassisStatusRequest{},
 	}
 	response := &ipmi.ChassisStatusResponse{}
 
@@ -36,7 +36,6 @@ func GetChassisPowerState(config map[string]string) (string, error) {
 
 	return state, nil
 }
-
 
 func SetChassisPowerState(config map[string]string, control ipmi.ChassisControl) error {
 	client, err := newClientFromConfig(config)

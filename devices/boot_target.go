@@ -38,7 +38,7 @@ func bmcBootTargetWrite(device *sdk.Device, data *sdk.WriteData) error {
 	action := data.Action
 	raw := data.Raw
 
-	// When writing to a BMC Power device, we always expect there to be
+	// When writing to a BMC boot target device, we always expect there to be
 	// raw data specified. If there isn't, we return an error.
 	if len(raw) == 0 {
 		return fmt.Errorf("no values specified for 'raw', but required")
@@ -102,6 +102,3 @@ func bmcBootTargetWrite(device *sdk.Device, data *sdk.WriteData) error {
 
 	return nil
 }
-
-
-// curl -H "Content-Type: application/json" -X POST -d '{"action": "target", "raw": "pxe"}' "http://localhost:5000/synse/2.0/write/ipmi/ipmisim/dbe630b6dd49d7b9d4f435349bc2cccc"
