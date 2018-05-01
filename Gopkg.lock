@@ -123,6 +123,12 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/vmware/goipmi"
+  packages = ["."]
+  revision = "ee598d2a3447d21f8ae7ad2afc6b09d46ad02a54"
+
+[[projects]]
+  branch = "master"
   name = "golang.org/x/crypto"
   packages = ["ssh/terminal"]
   revision = "2b6c08872f4b66da917bb4ce98df4f0307330f78"
@@ -223,6 +229,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "3db976c3c41a585711a3140de26fd8ae4c11f686f7d73364600306a99f823570"
+  inputs-digest = "6c041f2d5674a801d418b5d46964a826fc96d4a6881eebd76fbfa0cf64132948"
   solver-name = "gps-cdcl"
   solver-version = 1

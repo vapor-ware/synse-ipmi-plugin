@@ -101,7 +101,7 @@ jobs:
       - run:
           name: Building Artifacts
           command: |
-            gox --output="build/ipmi_{{.OS}}_{{.Arch}}" -osarch='!darwin/386 !darwin/arm !darwin/arm64' -os='darwin linux'
+            gox --output="build/ipmi_{{.OS}}_{{.Arch}}" -osarch='!darwin/386 !darwin/arm !darwin/arm64' -os='darwin linux' -parallel=10
       - run:
           name: Generate Changelog
           command: |

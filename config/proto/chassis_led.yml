@@ -1,8 +1,8 @@
 version: 1.0
 prototypes:
-  - type: boot_target
-    model: bmc-boot-target
+  - type: led
+    model: bmc-chassis-led
     manufacturer: Vapor IO
     protocol: ipmi
     output:
-      - type: target
+      - type: state
