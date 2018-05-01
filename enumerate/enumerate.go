@@ -94,6 +94,7 @@ func DeviceEnumerator(data map[string]interface{}) ([]*config.DeviceConfig, erro
 	// NOTE: The prototype for this device is NOT registered with the plugin
 	// (in plugin.go). As such, it should never show up as a device for the plugin.
 	// See the comment there for more info.
+	/*
 	identifyLed := config.DeviceConfig{
 		Version: "1",
 		Type:    "led",
@@ -113,6 +114,7 @@ func DeviceEnumerator(data map[string]interface{}) ([]*config.DeviceConfig, erro
 		},
 	}
 	devices = append(devices, &identifyLed)
+	*/
 
 	return devices, nil
 }
