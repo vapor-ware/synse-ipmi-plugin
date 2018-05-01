@@ -95,25 +95,25 @@ func DeviceEnumerator(data map[string]interface{}) ([]*config.DeviceConfig, erro
 	// (in plugin.go). As such, it should never show up as a device for the plugin.
 	// See the comment there for more info.
 	/*
-	identifyLed := config.DeviceConfig{
-		Version: "1",
-		Type:    "led",
-		Model:   "bmc-chassis-led",
-		Location: config.Location{
-			Rack:  "ipmi",
-			Board: conn.Hostname,
-		},
-		Data: map[string]string{
-			"id":        "3", // FIXME (etd): see above
-			"path":      conn.Path,
-			"hostname":  conn.Hostname,
-			"port":      strconv.Itoa(conn.Port),
-			"username":  conn.Username,
-			"password":  conn.Password,
-			"interface": conn.Interface,
-		},
-	}
-	devices = append(devices, &identifyLed)
+		identifyLed := config.DeviceConfig{
+			Version: "1",
+			Type:    "led",
+			Model:   "bmc-chassis-led",
+			Location: config.Location{
+				Rack:  "ipmi",
+				Board: conn.Hostname,
+			},
+			Data: map[string]string{
+				"id":        "3", // FIXME (etd): see above
+				"path":      conn.Path,
+				"hostname":  conn.Hostname,
+				"port":      strconv.Itoa(conn.Port),
+				"username":  conn.Username,
+				"password":  conn.Password,
+				"interface": conn.Interface,
+			},
+		}
+		devices = append(devices, &identifyLed)
 	*/
 
 	return devices, nil
