@@ -18,8 +18,8 @@ var BmcPower = sdk.DeviceHandler{
 	Write: bmcPowerWrite,
 }
 
+// bmcPowerRead is the read handler function for bmc-power devices.
 func bmcPowerRead(device *sdk.Device) ([]*sdk.Reading, error) {
-
 	state, err := protocol.GetChassisPowerState(device.Data)
 	if err != nil {
 		return nil, err
@@ -31,8 +31,8 @@ func bmcPowerRead(device *sdk.Device) ([]*sdk.Reading, error) {
 	return readings, nil
 }
 
+// bmcPowerWrite is the write handler function for bmc-power devices.
 func bmcPowerWrite(device *sdk.Device, data *sdk.WriteData) error {
-
 	action := data.Action
 	raw := data.Raw
 

@@ -1,3 +1,9 @@
+#
+# deploy.yml
+#
+# Simple deployment of Synse Server, Synse IPMI Plugin, and an
+# IPMI simulator as backing for the IPMI Plugin.
+#
 version: "3"
 services:
   synse-server:

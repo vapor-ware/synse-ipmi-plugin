@@ -40,6 +40,10 @@ ifndef HAS_DEP
 endif
 	dep ensure -v
 
+.PHONY: deploy
+deploy:  ## Run a local deployment of Synse Server, IPMI Plugin, IPMI Simulator
+	docker-compose -f deploy.yml up -d
+
 .PHONY: docker
 docker:  ## Build the docker image
 	docker build -f Dockerfile \

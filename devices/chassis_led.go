@@ -22,12 +22,12 @@ var BmcChassisLed = sdk.DeviceHandler{
 	Type:  "led",
 	Model: "bmc-chassis-led",
 
-	Read:  bmcChassisRead,
-	Write: bmcChassisWrite,
+	Read:  bmcChassisLedRead,
+	Write: bmcChassisLedWrite,
 }
 
-func bmcChassisRead(device *sdk.Device) ([]*sdk.Reading, error) {
-
+// bmcChassisLedRead is the read handler function for bmc-chassis-led devices.
+func bmcChassisLedRead(device *sdk.Device) ([]*sdk.Reading, error) {
 	state, err := protocol.GetChassisIdentify(device.Data)
 	if err != nil {
 		return nil, err
@@ -36,12 +36,11 @@ func bmcChassisRead(device *sdk.Device) ([]*sdk.Reading, error) {
 	ret := []*sdk.Reading{
 		sdk.NewReading("state", state),
 	}
-
 	return ret, nil
 }
 
-func bmcChassisWrite(device *sdk.Device, data *sdk.WriteData) error {
-
+// bmcChassisLedWrite is the write handler function for bmc-chassis-led devices.
+func bmcChassisLedWrite(device *sdk.Device, data *sdk.WriteData) error {
 	action := data.Action
 	raw := data.Raw
 

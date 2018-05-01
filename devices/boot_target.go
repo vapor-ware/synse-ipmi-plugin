@@ -19,8 +19,8 @@ var BmcBootTarget = sdk.DeviceHandler{
 	Write: bmcBootTargetWrite,
 }
 
+// bmcBootTargetRead is the read handler function for bmc-boot-target devices.
 func bmcBootTargetRead(device *sdk.Device) ([]*sdk.Reading, error) {
-
 	target, err := protocol.GetChassisBootTarget(device.Data)
 	if err != nil {
 		return nil, err
@@ -29,12 +29,11 @@ func bmcBootTargetRead(device *sdk.Device) ([]*sdk.Reading, error) {
 	ret := []*sdk.Reading{
 		sdk.NewReading("target", target),
 	}
-
 	return ret, nil
 }
 
+// bmcBootTargetWrite is the write handler function for bmc-boot-target devices.
 func bmcBootTargetWrite(device *sdk.Device, data *sdk.WriteData) error {
-
 	action := data.Action
 	raw := data.Raw
 

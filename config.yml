@@ -1,3 +1,13 @@
+#
+# config.yml
+#
+# Sample plugin configuration for the Synse IPMI Plugin. This
+# plugin configuration is used for the example deployment and
+# is configured to run against an IPMI simulator container.
+#
+# A different configuration YAML should be used for production
+# deployments.
+#
 version: 1.0
 name: ipmi
 debug: true

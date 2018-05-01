@@ -3,15 +3,20 @@ package protocol
 import (
 	"fmt"
 
+	"github.com/vapor-ware/synse-sdk/sdk/logger"
 	"github.com/vmware/goipmi"
 )
 
+// IdentifyState represents the state of the identify device
+// on the BMC managed chassis.
 type IdentifyState uint8
 
+// IPMI command for chassis identify.
 const (
 	CommandChassisIdentify = ipmi.Command(0x04)
 )
 
+// Chassis identify IPMI byte constants.
 const (
 	ChassisIdentifySupported    = 0x40
 	ChassisIdentifyMask         = 0x30
@@ -21,6 +26,7 @@ const (
 	ChassisIdentifyReserved     = 0x30
 )
 
+// States for the chassis identify device.
 const (
 	IdentifyOff         = IdentifyState(0x0)
 	IdentifyOn          = IdentifyState(0x1)
@@ -57,16 +63,10 @@ func GetIdentifyState(status *ipmi.ChassisStatusResponse) IdentifyState {
 	return IdentifyUnsupported
 }
 
-func Identify(c *ipmi.Client, time int, indefinately bool) error {
+// Identify issues a request to enable/disable the chassis identify device.
+func Identify(c *ipmi.Client, time int) error {
 	if time > 255 || time < 0 {
 		return fmt.Errorf("invalid time value: %d", time)
-	}
-
-	var force uint8
-	if indefinately {
-		force = 1
-	} else {
-		force = 0
 	}
 
 	request := &ipmi.Request{
@@ -74,12 +74,12 @@ func Identify(c *ipmi.Client, time int, indefinately bool) error {
 		Command:         CommandChassisIdentify,
 		Data: &ChassisIdentifyRequest{
 			Interval: uint8(time),
-			Force:    force,
 		},
 	}
 	return c.Send(request, &ChassisIdentifyResponse{})
 }
 
+// GetChassisIdentify gets the current identify state from the chassis.
 func GetChassisIdentify(config map[string]string) (string, error) {
 	client, err := newClientFromConfig(config)
 	if err != nil {
@@ -116,6 +116,7 @@ func GetChassisIdentify(config map[string]string) (string, error) {
 	return state, err
 }
 
+// SetChassisIdentify sets the identify state of the chassis
 func SetChassisIdentify(config map[string]string, state IdentifyState) error {
 	client, err := newClientFromConfig(config)
 	if err != nil {
@@ -132,9 +133,9 @@ func SetChassisIdentify(config map[string]string, state IdentifyState) error {
 		return fmt.Errorf("identify state unsupported for setting: %v", state)
 	}
 
+	logger.Debugf("Setting chassis to identify for: %d seconds", time)
 	return Identify(
 		client,
 		time,
-		false, // for now, never turn it on indefinitely
 	)
 }

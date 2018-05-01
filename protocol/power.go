@@ -3,9 +3,11 @@ package protocol
 import (
 	"fmt"
 
+	"github.com/vapor-ware/synse-sdk/sdk/logger"
 	"github.com/vmware/goipmi"
 )
 
+// GetChassisPowerState gets the current state (on/off) of the chassis.
 func GetChassisPowerState(config map[string]string) (string, error) {
 	client, err := newClientFromConfig(config)
 	if err != nil {
@@ -37,11 +39,13 @@ func GetChassisPowerState(config map[string]string) (string, error) {
 	return state, nil
 }
 
+// SetChassisPowerState sets the state of the chassis.
 func SetChassisPowerState(config map[string]string, control ipmi.ChassisControl) error {
 	client, err := newClientFromConfig(config)
 	if err != nil {
 		return err
 	}
 
+	logger.Debugf("Setting power state to: %s", control.String())
 	return client.Control(control)
 }

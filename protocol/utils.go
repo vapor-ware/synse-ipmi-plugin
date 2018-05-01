@@ -7,6 +7,8 @@ import (
 	"github.com/vmware/goipmi"
 )
 
+// newClientFromConfig is a utility function to create a new IPMI client
+// using the configuration specified in a Device's Data field.
 func newClientFromConfig(config map[string]string) (*ipmi.Client, error) {
 	conn, err := makeConnection(config)
 	if err != nil {
@@ -15,6 +17,8 @@ func newClientFromConfig(config map[string]string) (*ipmi.Client, error) {
 	return ipmi.NewClient(conn)
 }
 
+// makeConnection is a utility function to initialize the ipmi.Connection
+// used for an ipmi.Client by parsing the Device's Data map.
 func makeConnection(data map[string]string) (*ipmi.Connection, error) {
 	// FIXME (etd): need to do some type casting because the device
 	// data is a map[string]string, but we need some values as ints
