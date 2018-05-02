@@ -107,6 +107,12 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/vapor-ware/goipmi"
+  packages = ["."]
+  revision = "0bfe430a1c3594194822863d09a1a0244ae8f54f"
+
+[[projects]]
+  branch = "master"
   name = "github.com/vapor-ware/synse-sdk"
   packages = [
     "sdk",
@@ -120,12 +126,6 @@
   name = "github.com/vapor-ware/synse-server-grpc"
   packages = ["go"]
   revision = "978e8f5af7b012c9d8212616133d8b683945db4b"
-
-[[projects]]
-  branch = "master"
-  name = "github.com/vmware/goipmi"
-  packages = ["."]
-  revision = "ee598d2a3447d21f8ae7ad2afc6b09d46ad02a54"
 
 [[projects]]
   branch = "master"
@@ -229,6 +229,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "6c041f2d5674a801d418b5d46964a826fc96d4a6881eebd76fbfa0cf64132948"
+  inputs-digest = "47e9af15a871ee9c6070d863095662aa2f0027dcbcb763b52ce4c129eed80f7e"
   solver-name = "gps-cdcl"
   solver-version = 1

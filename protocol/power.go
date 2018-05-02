@@ -3,8 +3,8 @@ package protocol
 import (
 	"fmt"
 
+	"github.com/vapor-ware/goipmi"
 	"github.com/vapor-ware/synse-sdk/sdk/logger"
-	"github.com/vmware/goipmi"
 )
 
 // GetChassisPowerState gets the current state (on/off) of the chassis.

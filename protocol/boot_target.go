@@ -1,8 +1,8 @@
 package protocol
 
 import (
+	"github.com/vapor-ware/goipmi"
 	"github.com/vapor-ware/synse-sdk/sdk/logger"
-	"github.com/vmware/goipmi"
 )
 
 // GetChassisBootTarget gets the current boot device for the chassis.

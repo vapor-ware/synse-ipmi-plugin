@@ -42,7 +42,7 @@ endif
 
 .PHONY: deploy
 deploy:  ## Run a local deployment of Synse Server, IPMI Plugin, IPMI Simulator
-	docker-compose -f deploy.yml up -d
+	docker-compose -f deploy.yml up
 
 .PHONY: docker
 docker:  ## Build the docker image

@@ -3,9 +3,12 @@ package protocol
 import (
 	"fmt"
 
+	"github.com/vapor-ware/goipmi"
 	"github.com/vapor-ware/synse-sdk/sdk/logger"
-	"github.com/vmware/goipmi"
 )
+
+// FIXME - now that we have a fork of goipmi, some of this stuff should
+// probably live there
 
 // IdentifyState represents the state of the identify device
 // on the BMC managed chassis.

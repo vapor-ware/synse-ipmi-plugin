@@ -48,19 +48,8 @@ func main() {
 		// BMC Chassis Boot Target, e.g. ipmitool [options] chassis bootdev ...
 		&devices.BmcBootTarget,
 
-		// Chassis LED (identify) is disabled. The underlying IPMI library
-		// wraps ipmitool for the lanplus interface. The ipmitool (version
-		// 1.8.16) prints out the response bytes on new lines to keep 16-byte
-		// width rows, e.g.
-		//
-		//	$ ipmitool -H 127.0.0.1 -U ADMIN -P ADMIN -I lanplus raw 0x00 0x04 0x0f 0x00
-		//  7f 00 00 90 cb 68 d5 ff 7f 00 00 b0 ca 68 d5 ff
-		//	7f 00 00 90 cb 68 d5 ff 7f 00 00 20 91 88 01 ec
-		//  55 00 00
-		//
-		// The IPMI library does not properly handle the newline in the case
-		// of more than one line of raw response, causing a panic.
-		//&devices.BmcChassisLed,
+		// BMC Chassis LED (identify), e.g. ipmitool [options] chassis identify ...
+		&devices.BmcChassisLed,
 	)
 
 	// Set build-time version info.
