@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/vapor-ware/goipmi"
 	"github.com/vapor-ware/synse-ipmi-plugin/protocol"
 	"github.com/vapor-ware/synse-sdk/sdk"
-	"github.com/vmware/goipmi"
 )
 
 // BmcPower is the handler for the bmc-power device.

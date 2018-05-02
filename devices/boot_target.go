@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/vapor-ware/goipmi"
 	"github.com/vapor-ware/synse-ipmi-plugin/protocol"
 	"github.com/vapor-ware/synse-sdk/sdk"
 	"github.com/vapor-ware/synse-sdk/sdk/logger"
-	"github.com/vmware/goipmi"
 )
 
 // BmcBootTarget is the handler for the bmc-boot-target device.

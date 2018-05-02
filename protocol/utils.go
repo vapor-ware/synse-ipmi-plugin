@@ -4,7 +4,7 @@ import (
 	"strconv"
 
 	"github.com/mitchellh/mapstructure"
-	"github.com/vmware/goipmi"
+	"github.com/vapor-ware/goipmi"
 )
 
 // newClientFromConfig is a utility function to create a new IPMI client

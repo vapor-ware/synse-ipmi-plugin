@@ -4,9 +4,9 @@ import (
 	"strconv"
 
 	"github.com/mitchellh/mapstructure"
+	"github.com/vapor-ware/goipmi"
 	"github.com/vapor-ware/synse-sdk/sdk/config"
 	"github.com/vapor-ware/synse-sdk/sdk/logger"
-	"github.com/vmware/goipmi"
 )
 
 // FIXME (etd): the SDK needs some improvements to how dynamic device
@@ -90,31 +90,25 @@ func DeviceEnumerator(data map[string]interface{}) ([]*config.DeviceConfig, erro
 
 	// Make new identify device for the BMC. This device would be akin to
 	// `ipmitool [options] chassis identify ...` commands.
-	//
-	// NOTE: The prototype for this device is NOT registered with the plugin
-	// (in plugin.go). As such, it should never show up as a device for the plugin.
-	// See the comment there for more info.
-	/*
-		identifyLed := config.DeviceConfig{
-			Version: "1",
-			Type:    "led",
-			Model:   "bmc-chassis-led",
-			Location: config.Location{
-				Rack:  "ipmi",
-				Board: conn.Hostname,
-			},
-			Data: map[string]string{
-				"id":        "3", // FIXME (etd): see above
-				"path":      conn.Path,
-				"hostname":  conn.Hostname,
-				"port":      strconv.Itoa(conn.Port),
-				"username":  conn.Username,
-				"password":  conn.Password,
-				"interface": conn.Interface,
-			},
-		}
-		devices = append(devices, &identifyLed)
-	*/
+	identifyLed := config.DeviceConfig{
+		Version: "1",
+		Type:    "led",
+		Model:   "bmc-chassis-led",
+		Location: config.Location{
+			Rack:  "ipmi",
+			Board: conn.Hostname,
+		},
+		Data: map[string]string{
+			"id":        "3", // FIXME (etd): see above
+			"path":      conn.Path,
+			"hostname":  conn.Hostname,
+			"port":      strconv.Itoa(conn.Port),
+			"username":  conn.Username,
+			"password":  conn.Password,
+			"interface": conn.Interface,
+		},
+	}
+	devices = append(devices, &identifyLed)
 
 	return devices, nil
 }
