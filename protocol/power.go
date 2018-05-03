@@ -27,7 +27,7 @@ func GetChassisPowerState(config map[string]string) (string, error) {
 	}
 
 	var state string
-	switch response.PowerState {
+	switch uint8(response.PowerState) & 1 {
 	case 0:
 		state = "off"
 	case 1:
