@@ -6,7 +6,7 @@ import (
 )
 
 const (
-	powerOn  = 0x01
+	powerOn = 0x01
 )
 
 // GetChassisPowerState gets the current state (on/off) of the chassis.
