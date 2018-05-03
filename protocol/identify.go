@@ -111,7 +111,12 @@ func GetChassisIdentify(config map[string]string) (string, error) {
 	case IdentifyOff:
 		state = "off"
 	case IdentifyUnsupported:
-		return "", fmt.Errorf("chassis identify unsupported (identify state: %v)", identifyState)
+		// Unclear that this should be an error, since this is optionally
+		// specified. This setting is optional for IPMI 2.0 according to the
+		// spec and it just means that the "chassis identify command support
+		// [is] unspecified via this command", not that identify support is
+		// unsupported by the BMC.
+		return "", fmt.Errorf("chassis identify not specified as supported (identify state: %v)", identifyState)
 	default:
 		return "", fmt.Errorf("unsupported identify state: %v", identifyState)
 	}
