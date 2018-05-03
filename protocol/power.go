@@ -1,10 +1,12 @@
 package protocol
 
 import (
-	"fmt"
-
 	"github.com/vapor-ware/goipmi"
 	"github.com/vapor-ware/synse-sdk/sdk/logger"
+)
+
+const (
+	powerOn  = 0x01
 )
 
 // GetChassisPowerState gets the current state (on/off) of the chassis.
@@ -27,13 +29,15 @@ func GetChassisPowerState(config map[string]string) (string, error) {
 	}
 
 	var state string
-	switch uint8(response.PowerState) & 1 {
-	case 0:
-		state = "off"
-	case 1:
+
+	// Check the power state. According to the IPMI spec, Section 28.2, table 28:
+	// Get Chassis Status Command, power on/off state is held in bit 0 of the
+	// Current Power State byte, where 1b = system power is on, 0b = system power
+	// is off
+	if response.PowerState&1 == powerOn {
 		state = "on"
-	default:
-		return "", fmt.Errorf("unknown power state response: %v", response.PowerState)
+	} else {
+		state = "off"
 	}
 
 	return state, nil
