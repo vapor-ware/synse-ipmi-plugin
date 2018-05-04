@@ -1,28 +1,17 @@
 #
 # config.yml
 #
-# Sample plugin configuration for the Synse IPMI Plugin. This
-# plugin configuration is used for the example deployment and
-# is configured to run against an IPMI simulator container.
+# A basic plugin configuration for the Synse IPMI Plugin. This
+# config is the default configuration file used in the Docker
+# image for the plugin.
 #
-# A different configuration YAML should be used for production
-# deployments.
+# With this configuration file, the plugin will not do anything,
+# as there are no BMCs being configured. It is up to the user to
+# supply their own configuration.
 #
 version: 1.0
 name: ipmi
-debug: true
+
 network:
   type: tcp
   address: ":5001"
-settings:
-  mode: parallel
-  read:
-    interval: 3s
-  write:
-    interval: 1s
-auto_enumerate:
-  - hostname: ipmisim
-    port: 623
-    username: ADMIN
-    password: ADMIN
-    interface: lanplus

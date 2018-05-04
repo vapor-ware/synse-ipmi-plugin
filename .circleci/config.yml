@@ -125,22 +125,21 @@ jobs:
               -replace \
               -draft \
               ${CIRCLE_TAG} build/
+
 workflows:
   version: 2
   build:
     jobs:
       - build
-      # FIXME (etd) - temporarily disabling push, since the plugin is still
-      # under development and will not work.
-      #- push:
-      #    requires:
-      #      - build
-      #    filters:
-      #      branches:
-      #        only: master
+      - push:
+          requires:
+            - build
+          filters:
+            branches:
+              only: master
       - release:
           filters:
             branches:
               ignore: /.*/
             tags:
-              only: /^[0-9]*(\.[0-9]*)*$/
+              only: /^[0-9]*(\.[0-9]*)*(-(\S)*)?$/

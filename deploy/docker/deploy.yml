@@ -22,9 +22,11 @@ services:
     ports:
       - 5001:5001
     volumes:
-      - ./deploy/devices:/tmp/devices
+      - ./devices:/tmp/devices
+      - ../../example:/tmp/plugin
     environment:
       PLUGIN_DEVICE_PATH: /tmp/devices
+      PLUGIN_CONFIG: /tmp/plugin
     links:
       - ipmisim
 
