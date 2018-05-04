@@ -3,7 +3,7 @@
 #
 
 PLUGIN_NAME := ipmi
-PLUGIN_VERSION=0.1-dev
+PLUGIN_VERSION=0.1.0-alpha
 
 PKG_CTX=main
 BUILD_DATE := $(shell date -u +%Y-%m-%dT%T 2> /dev/null)
@@ -42,7 +42,7 @@ endif
 
 .PHONY: deploy
 deploy:  ## Run a local deployment of Synse Server, IPMI Plugin, IPMI Simulator
-	docker-compose -f deploy.yml up
+	docker-compose -f deploy/docker/deploy.yml up
 
 .PHONY: docker
 docker:  ## Build the docker image
