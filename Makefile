@@ -62,6 +62,11 @@ docker:  ## Build the docker image
 fmt:  ## Run goimports on all go files
 	find . -name '*.go' -not -wholename './vendor/*' | while read -r file; do goimports -w "$$file"; done
 
+.PHONY: github-tag
+github-tag:  ## Create and push a tag with the current plugin version
+	git tag -a ${PLUGIN_VERSION} -m "${PLUGIN_NAME} version ${PLUGIN_VERSION}"
+	git push -u origin ${PLUGIN_VERSION}
+
 .PHONY: lint
 lint:  ## Lint project source files
 ifndef HAS_LINT
