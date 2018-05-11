@@ -1,25 +1,47 @@
+# Defaults for our CircleCI jobs.
+defaults: &defaults
+  working_directory: /go/src/github.com/vapor-ware/synse-ipmi-plugin
+  docker:
+    - image: circleci/golang:latest
+  environment:
+    IMAGE_NAME: "vaporio/ipmi-plugin"
+
+
+# Common config for tag-triggered workflows
+tag-filters: &tag-filters
+  filters:
+    branches:
+      ignore: /.*/
+    tags:
+      only: /^[0-9]*(\.[0-9]*)*(-(\S)*)?$/
+
+
+# CircleCI Config
 version: 2
 jobs:
 
-  # Build and test the IPMI plugin.
+  # build
+  #
+  # This job is run for all commits. It makes sure that: the source code
+  # is properly linted, the source code is properly formatted, the source
+  # can be compiled and built successfully, and the Docker image can be
+  # built successfully.
+  #
+  # This job does not publish any build artifacts.
   build:
-    working_directory: /go/src/github.com/vapor-ware/synse-ipmi-plugin
-    docker:
-      - image: circleci/golang:latest
+    <<: *defaults
     steps:
       - checkout
       - restore_cache:
           keys:
-            - ipmi-vendor-{{ checksum "Gopkg.toml" }}-{{ checksum "Gopkg.lock" }}
-            - ipmi-vendor-{{ checksum "Gopkg.toml" }}
+            - v1-vendor-{{ checksum "Gopkg.toml" }}-{{ checksum "Gopkg.lock" }}
+            - v1-vendor-{{ checksum "Gopkg.toml" }}
       - run:
           name: Install Vendored Dependencies
-          command: |
-            make dep
+          command: make dep
       - run:
           name: Lint
-          command: |
-            make lint
+          command: make lint
       - run:
           name: Format
           command: |
@@ -30,91 +52,97 @@ jobs:
             fi
       - run:
           name: Build Binary
-          command: |
-            make build
-      - setup_remote_docker
+          command: make build
+      - setup_remote_docker:
+          docker_layer_caching: true
       - run:
           name: Build Docker Image
-          command: |
-            make docker
+          command: make docker
       - save_cache:
           when: on_success
-          key: ipmi-vendor-{{ checksum "Gopkg.toml" }}-{{ checksum "Gopkg.lock" }}
+          key: v1-vendor-{{ checksum "Gopkg.toml" }}-{{ checksum "Gopkg.lock" }}
           paths:
             - vendor/
 
-  # Build and push the image to DockerHub.
-  push:
-    working_directory: /go/src/github.com/vapor-ware/synse-ipmi-plugin
-    docker:
-      - image: docker:17.11.0-ce-git
-    environment:
-      - GOPATH: /go
+  # publish-edge
+  #
+  # This job is run when a commit is made to the 'master' branch. This
+  # includes commits directly to master and pull request merges. It builds
+  # the Docker image for the repo and publishes it to DockerHub with the
+  # 'edge' tag. This is effectively the 'daily/nightly' build.
+  publish-edge:
+    <<: *defaults
     steps:
       - checkout
-      - setup_remote_docker
-      - run:
-          name: Install Dependencies
-          command: |
-            apk add --update --no-cache go musl-dev make
-            go get -v github.com/golang/dep/cmd/dep
-            go install github.com/golang/dep/cmd/dep
-            /go/bin/dep ensure -v
-      - run:
-          name: Build Docker Image
-          command: |
-            make docker
-      - deploy:
-          name: Push to DockerHub
-          command: |
-            docker login -u $DOCKER_USER -p $DOCKER_PASS
-            version=$(make version)
-            docker push vaporio/ipmi-plugin:latest
-            docker push vaporio/ipmi-plugin:$version
-
-  # Create a GitHub release draft for the pushed tag.
-  release:
-    working_directory: /go/src/github.com/vapor-ware/synse-ipmi-plugin
-    docker:
-      - image: circleci/golang:latest
-    steps:
       - setup_remote_docker:
           docker_layer_caching: true
+      - run:
+          name: Install Dependencies
+          command: make dep
+      - run:
+          name: Build and Publish Docker Images
+          command: |
+            docker login -u $DOCKER_USER -p $DOCKER_PASS
+            ./bin/ci/build_and_publish.sh edge
+
+  # publish-release
+  #
+  # This job is run when a tag is pushed to GitHub. Simultaneous to this, a
+  # release will be drafted in the 'release' job. This will build the Docker
+  # image for the repo and publishes it to DockerHub with the 'latest' tag
+  # and the appropriate version tags.
+  publish-release:
+    <<: *defaults
+    steps:
       - checkout
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - run:
+          name: Install Dependencies
+          command: make dep
       - run:
           name: Check Version matches Tag
+          command: make ci-check-version
+      - run:
+          name: Build and Publish Docker Images
           command: |
-            version=$(make version)
-            if [ "${version}" != "${CIRCLE_TAG}" ]; then
-              echo "Version ${version} does not match Tag ${CIRCLE_TAG}"
-              exit 1
-            fi
+            docker login -u $DOCKER_USER -p $DOCKER_PASS
+            ./bin/ci/build_and_publish.sh latest
+
+  # release
+  #
+  # This job creates a GitHub release draft for the tag that was pushed.
+  # It generates a changelog for the release and attaches build artifacts
+  # to the release as well. The release should be manually published on GitHub.
+  release:
+    <<: *defaults
+    steps:
+      - checkout
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - run:
+          name: Check Version matches Tag
+          command: make ci-check-version
       - run:
           name: Install Vendored Dependencies
-          command: |
-            make dep
-      - run:
-          name: Get Builder and Distributor
-          command: |
-            go get -v github.com/mitchellh/gox
-            go get -v github.com/tcnksm/ghr
+          command: make dep
       - run:
           name: Building Artifacts
-          command: |
-            gox --output="build/ipmi_{{.OS}}_{{.Arch}}" -osarch='!darwin/386 !darwin/arm !darwin/arm64' -os='darwin linux' -parallel=10
+          command: make ci-build
       - run:
           name: Generate Changelog
           command: |
             docker pull timfallmk/github-changelog-generator
             docker run --name changelog timfallmk/github-changelog-generator \
-              -u vapor-ware \
-              -p synse-ipmi-plugin \
-              --since-tag $(git describe --abbrev=0 --tags `git rev-list --tags --skip=1 --max-count=1`) \
-              -t ${GITHUB_TOKEN}
+              -u ${CIRCLE_PROJECT_USERNAME} \
+              -p ${CIRCLE_PROJECT_REPONAME} \
+              -t ${GITHUB_TOKEN} \
+              --since-tag $(git describe --abbrev=0 --tags `git rev-list --tags --skip=1 --max-count=1`)
             docker cp changelog:/usr/local/src/your-app/CHANGELOG.md ./
       - run:
           name: Create Release
           command: |
+            go get -v github.com/tcnksm/ghr
             if git describe --exact-match --tags HEAD; then
               CIRCLE_TAG=$(git describe --exact-match --tags HEAD)
             fi
@@ -126,20 +154,19 @@ jobs:
               -draft \
               ${CIRCLE_TAG} build/
 
+
 workflows:
   version: 2
   build:
     jobs:
       - build
-      - push:
+      - publish-edge:
           requires:
             - build
           filters:
             branches:
               only: master
+      - publish-release:
+          <<: *tag-filters
       - release:
-          filters:
-            branches:
-              ignore: /.*/
-            tags:
-              only: /^[0-9]*(\.[0-9]*)*(-(\S)*)?$/
+          <<: *tag-filters

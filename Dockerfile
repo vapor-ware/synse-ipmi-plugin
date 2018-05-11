@@ -1,7 +1,7 @@
 FROM iron/go:dev as builder
 WORKDIR /go/src/github.com/vapor-ware/synse-ipmi-plugin
 COPY . .
-RUN make build GIT_TAG="" GIT_COMMIT=""
+RUN make build
 
 
 FROM iron/go
