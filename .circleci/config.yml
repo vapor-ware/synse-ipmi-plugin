@@ -132,12 +132,15 @@ jobs:
       - run:
           name: Generate Changelog
           command: |
+            tag=$(git describe --abbrev=0 --tags `git rev-list --tags --skip=1 --max-count=1` || true)
+            since_tag=$(if [ "${tag}" ]; then echo "--since-tag ${tag}"; fi)
+
             docker pull timfallmk/github-changelog-generator
             docker run --name changelog timfallmk/github-changelog-generator \
               -u ${CIRCLE_PROJECT_USERNAME} \
               -p ${CIRCLE_PROJECT_REPONAME} \
               -t ${GITHUB_TOKEN} \
-              --since-tag $(git describe --abbrev=0 --tags `git rev-list --tags --skip=1 --max-count=1`)
+              ${since_tag}
             docker cp changelog:/usr/local/src/your-app/CHANGELOG.md ./
       - run:
           name: Create Release
@@ -161,12 +164,17 @@ workflows:
     jobs:
       - build
       - publish-edge:
+          context: vapor-auto
           requires:
             - build
           filters:
             branches:
               only: master
-      - publish-release:
-          <<: *tag-filters
       - release:
+          context: vapor-auto
           <<: *tag-filters
+      - publish-release:
+          context: vapor-auto
+          <<: *tag-filters
+          requires:
+            - release
