@@ -64,7 +64,7 @@ fmt:  ## Run goimports on all go files
 
 .PHONY: github-tag
 github-tag:  ## Create and push a tag with the current plugin version
-	git tag -a ${PLUGIN_VERSION} -m "${PLUGIN_NAME} version ${PLUGIN_VERSION}"
+	git tag -a ${PLUGIN_VERSION} -m "${PLUGIN_NAME} plugin version ${PLUGIN_VERSION}"
 	git push -u origin ${PLUGIN_VERSION}
 
 .PHONY: lint
@@ -74,8 +74,13 @@ ifndef HAS_LINT
 	gometalinter --install
 endif
 	@ # disable gotype: https://github.com/alecthomas/gometalinter/issues/40
-	gometalinter ./... --tests --vendor --deadline=5m \
-		--disable=gotype --disable=gocyclo
+	gometalinter ./... \
+		--disable=gotype --disable=gocyclo \
+		--tests \
+		--vendor \
+		--sort=severity \
+		--aggregate \
+		--deadline=5m
 
 .PHONY: setup
 setup:  ## Install the build and development dependencies and set up vendoring
