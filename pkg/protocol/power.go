@@ -2,7 +2,8 @@ package protocol
 
 import (
 	"github.com/vapor-ware/goipmi"
-	"github.com/vapor-ware/synse-sdk/sdk/logger"
+
+	log "github.com/Sirupsen/logrus"
 )
 
 const (
@@ -10,7 +11,7 @@ const (
 )
 
 // GetChassisPowerState gets the current state (on/off) of the chassis.
-func GetChassisPowerState(config map[string]string) (string, error) {
+func GetChassisPowerState(config map[string]interface{}) (string, error) {
 	client, err := newClientFromConfig(config)
 	if err != nil {
 		return "", err
@@ -44,12 +45,12 @@ func GetChassisPowerState(config map[string]string) (string, error) {
 }
 
 // SetChassisPowerState sets the state of the chassis.
-func SetChassisPowerState(config map[string]string, control ipmi.ChassisControl) error {
+func SetChassisPowerState(config map[string]interface{}, control ipmi.ChassisControl) error {
 	client, err := newClientFromConfig(config)
 	if err != nil {
 		return err
 	}
 
-	logger.Debugf("Setting power state to: %s", control.String())
+	log.Debugf("Setting power state to: %s", control.String())
 	return client.Control(control)
 }

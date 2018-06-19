@@ -9,7 +9,6 @@
 # deployments.
 #
 version: 1.0
-name: ipmi
 debug: true
 network:
   type: tcp
@@ -20,9 +19,10 @@ settings:
     interval: 3s
   write:
     interval: 1s
-auto_enumerate:
-  - hostname: ipmisim
-    port: 623
-    username: ADMIN
-    password: ADMIN
-    interface: lanplus
+dynamicRegistration:
+  config:
+    - hostname: ipmisim
+      port: 623
+      username: ADMIN
+      password: ADMIN
+      interface: lanplus

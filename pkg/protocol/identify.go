@@ -3,8 +3,9 @@ package protocol
 import (
 	"fmt"
 
+	log "github.com/Sirupsen/logrus"
+
 	"github.com/vapor-ware/goipmi"
-	"github.com/vapor-ware/synse-sdk/sdk/logger"
 )
 
 // FIXME - now that we have a fork of goipmi, some of this stuff should
@@ -83,7 +84,7 @@ func Identify(c *ipmi.Client, time int) error {
 }
 
 // GetChassisIdentify gets the current identify state from the chassis.
-func GetChassisIdentify(config map[string]string) (string, error) {
+func GetChassisIdentify(config map[string]interface{}) (string, error) {
 	client, err := newClientFromConfig(config)
 	if err != nil {
 		return "", err
@@ -125,7 +126,7 @@ func GetChassisIdentify(config map[string]string) (string, error) {
 }
 
 // SetChassisIdentify sets the identify state of the chassis
-func SetChassisIdentify(config map[string]string, state IdentifyState) error {
+func SetChassisIdentify(config map[string]interface{}, state IdentifyState) error {
 	client, err := newClientFromConfig(config)
 	if err != nil {
 		return err
@@ -141,7 +142,7 @@ func SetChassisIdentify(config map[string]string, state IdentifyState) error {
 		return fmt.Errorf("identify state unsupported for setting: %v", state)
 	}
 
-	logger.Debugf("Setting chassis to identify for: %d seconds", time)
+	log.Debugf("Setting chassis to identify for: %d seconds", time)
 	return Identify(
 		client,
 		time,

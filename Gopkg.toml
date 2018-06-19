@@ -27,7 +27,15 @@
 
 [[constraint]]
   branch = "master"
+  name = "github.com/mitchellh/mapstructure"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/vapor-ware/goipmi"
+
+[[constraint]]
   name = "github.com/vapor-ware/synse-sdk"
+  branch = "v1.0"
 
 [prune]
   go-tests = true

@@ -64,20 +64,21 @@ there is no need to specify device instance configuration files here.
 ### plugin config
 After reading through the docs linked above for the plugin config, take a look at the [example
 plugin config](example/config.yml). This can be used as a reference. To specify your own BMCs, you
-will need to list them under the `auto_enumerate` field, e.g.
+will need to list them under the `dynamicRegistration` field, e.g.
 
 ```yaml
-auto_enumerate:
-  - hostname: 10.1.2.3
-    port: 623
-    username: ADMIN
-    password: ADMIN
-    interface: lanplus
-  - hostname: 10.1.2.4
-    port: 623
-    username: ADMIN
-    password: ADMIN
-    interface: lanplus
+dynamicRegistration:
+  config:
+    - hostname: 10.1.2.3
+      port: 623
+      username: ADMIN
+      password: ADMIN
+      interface: lanplus
+    - hostname: 10.1.2.4
+      port: 623
+      username: ADMIN
+      password: ADMIN
+      interface: lanplus
 ```
 
 Once you have your own plugin config, you can either mount it into the container at `/plugin/config.yml`, 
