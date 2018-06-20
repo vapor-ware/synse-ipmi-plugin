@@ -41,7 +41,7 @@ func bmcPowerWrite(device *sdk.Device, data *sdk.WriteData) error {
 	}
 
 	if action == "state" {
-		cmd := string(raw[0])
+		cmd := string(raw)
 
 		var state ipmi.ChassisControl
 		switch strings.ToLower(cmd) {

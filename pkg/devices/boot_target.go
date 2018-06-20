@@ -43,7 +43,7 @@ func bmcBootTargetWrite(device *sdk.Device, data *sdk.WriteData) error {
 	}
 
 	if action == "target" {
-		cmd := string(raw[0])
+		cmd := string(raw)
 
 		var target ipmi.BootDevice
 

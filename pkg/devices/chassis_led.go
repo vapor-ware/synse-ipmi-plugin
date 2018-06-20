@@ -49,7 +49,7 @@ func bmcChassisLedWrite(device *sdk.Device, data *sdk.WriteData) error {
 	}
 
 	if action == "state" {
-		cmd := string(raw[0])
+		cmd := string(raw)
 
 		var state protocol.IdentifyState
 		// TODO (etd): figure out if we want to support intervals. if so, how? could be
