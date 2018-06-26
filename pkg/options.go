@@ -58,7 +58,7 @@ func dynamicDeviceConfig(data map[string]interface{}) ([]*sdk.DeviceConfig, erro
 		},
 		Devices: []*sdk.DeviceKind{
 			{
-				Name:    "chassis.power",
+				Name: "chassis.power",
 				Outputs: []*sdk.DeviceOutput{
 					{Type: "chassis.power.state"},
 				},
@@ -80,7 +80,7 @@ func dynamicDeviceConfig(data map[string]interface{}) ([]*sdk.DeviceConfig, erro
 				},
 			},
 			{
-				Name:    "boot_target",
+				Name: "boot_target",
 				Outputs: []*sdk.DeviceOutput{
 					{Type: "chassis.boot.target"},
 				},
@@ -101,7 +101,7 @@ func dynamicDeviceConfig(data map[string]interface{}) ([]*sdk.DeviceConfig, erro
 				},
 			},
 			{
-				Name:    "chassis.led",
+				Name: "chassis.led",
 				Outputs: []*sdk.DeviceOutput{
 					{Type: "chassis.led.state"},
 				},
