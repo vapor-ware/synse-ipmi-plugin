@@ -25,10 +25,14 @@ func bmcBootTargetRead(device *sdk.Device) ([]*sdk.Reading, error) {
 		return nil, err
 	}
 
-	ret := []*sdk.Reading{
-		device.GetOutput("chassis.boot.target").MakeReading(target),
+	bootTarget, err := device.GetOutput("chassis.boot.target").MakeReading(target)
+	if err != nil {
+		return nil, err
 	}
-	return ret, nil
+
+	return []*sdk.Reading{
+		bootTarget,
+	}, nil
 }
 
 // bmcBootTargetWrite is the write handler function for bmc-boot-target devices.

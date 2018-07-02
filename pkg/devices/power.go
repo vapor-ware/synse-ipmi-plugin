@@ -23,10 +23,14 @@ func bmcPowerRead(device *sdk.Device) ([]*sdk.Reading, error) {
 		return nil, err
 	}
 
-	readings := []*sdk.Reading{
-		device.GetOutput("chassis.power.state").MakeReading(state),
+	powerState, err := device.GetOutput("chassis.power.state").MakeReading(state)
+	if err != nil {
+		return nil, err
 	}
-	return readings, nil
+
+	return []*sdk.Reading{
+		powerState,
+	}, nil
 }
 
 // bmcPowerWrite is the write handler function for bmc-power devices.

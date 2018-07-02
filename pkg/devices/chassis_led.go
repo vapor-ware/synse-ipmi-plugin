@@ -31,10 +31,14 @@ func bmcChassisLedRead(device *sdk.Device) ([]*sdk.Reading, error) {
 		return nil, err
 	}
 
-	ret := []*sdk.Reading{
-		device.GetOutput("chassis.led.state").MakeReading(state),
+	chassisIdentify, err := device.GetOutput("chassis.led.state").MakeReading(state)
+	if err != nil {
+		return nil, err
 	}
-	return ret, nil
+
+	return []*sdk.Reading{
+		chassisIdentify,
+	}, nil
 }
 
 // bmcChassisLedWrite is the write handler function for bmc-chassis-led devices.
