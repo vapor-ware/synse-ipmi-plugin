@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/vapor-ware/synse-ipmi-plugin/protocol"
+	"github.com/vapor-ware/synse-ipmi-plugin/pkg/protocol"
 	"github.com/vapor-ware/synse-sdk/sdk"
 )
 
-// BmcChassisLed is the handler for the bmc-boot-target device.
+// ChassisLed is the handler for the bmc-boot-target device.
 //
 // This is really chassis identify, which according to the IPMI spec:
 //
@@ -18,10 +18,8 @@ import (
 //
 // This was considered LED in Synse 1.4 so we will continue to consider it
 // an LED device, even though it may not be.
-var BmcChassisLed = sdk.DeviceHandler{
-	Type:  "led",
-	Model: "bmc-chassis-led",
-
+var ChassisLed = sdk.DeviceHandler{
+	Name:  "chassis.led",
 	Read:  bmcChassisLedRead,
 	Write: bmcChassisLedWrite,
 }
@@ -33,16 +31,20 @@ func bmcChassisLedRead(device *sdk.Device) ([]*sdk.Reading, error) {
 		return nil, err
 	}
 
-	ret := []*sdk.Reading{
-		sdk.NewReading("state", state),
+	chassisIdentify, err := device.GetOutput("chassis.led.state").MakeReading(state)
+	if err != nil {
+		return nil, err
 	}
-	return ret, nil
+
+	return []*sdk.Reading{
+		chassisIdentify,
+	}, nil
 }
 
 // bmcChassisLedWrite is the write handler function for bmc-chassis-led devices.
 func bmcChassisLedWrite(device *sdk.Device, data *sdk.WriteData) error {
 	action := data.Action
-	raw := data.Raw
+	raw := data.Data
 
 	// When writing to a BMC LED (identify) device, we always expect there to be
 	// raw data specified. If there isn't, we return an error.
@@ -51,7 +53,7 @@ func bmcChassisLedWrite(device *sdk.Device, data *sdk.WriteData) error {
 	}
 
 	if action == "state" {
-		cmd := string(raw[0])
+		cmd := string(raw)
 
 		var state protocol.IdentifyState
 		// TODO (etd): figure out if we want to support intervals. if so, how? could be

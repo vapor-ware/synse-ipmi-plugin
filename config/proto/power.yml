@@ -1,8 +1,0 @@
-version: 1.0
-prototypes:
-  - type: power
-    model: bmc-power
-    manufacturer: Vapor IO
-    protocol: ipmi
-    output:
-      - type: state

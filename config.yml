@@ -10,8 +10,7 @@
 # supply their own configuration.
 #
 version: 1.0
-name: ipmi
-
+debug: true
 network:
   type: tcp
   address: ":5001"

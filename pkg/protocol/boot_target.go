@@ -1,12 +1,13 @@
 package protocol
 
 import (
+	log "github.com/Sirupsen/logrus"
+
 	"github.com/vapor-ware/goipmi"
-	"github.com/vapor-ware/synse-sdk/sdk/logger"
 )
 
 // GetChassisBootTarget gets the current boot device for the chassis.
-func GetChassisBootTarget(config map[string]string) (string, error) {
+func GetChassisBootTarget(config map[string]interface{}) (string, error) {
 	client, err := newClientFromConfig(config)
 	if err != nil {
 		return "", err
@@ -34,11 +35,11 @@ func GetChassisBootTarget(config map[string]string) (string, error) {
 }
 
 // SetChassisBootTarget sets the boot device for the chassis.
-func SetChassisBootTarget(config map[string]string, target ipmi.BootDevice) error {
+func SetChassisBootTarget(config map[string]interface{}, target ipmi.BootDevice) error {
 	client, err := newClientFromConfig(config)
 	if err != nil {
 		return err
 	}
-	logger.Debugf("Setting boot target to: %s", target.String())
+	log.Debugf("Setting boot target to: %s", target.String())
 	return client.SetBootDevice(target)
 }

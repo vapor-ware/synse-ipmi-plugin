@@ -12,7 +12,7 @@ services:
     ports:
       - 5000:5000
     environment:
-      SYNSE_PLUGIN_TCP_IPMI: ipmi-plugin:5001
+      SYNSE_PLUGIN_TCP: ipmi-plugin:5001
     links:
       - ipmi-plugin
 
@@ -22,10 +22,8 @@ services:
     ports:
       - 5001:5001
     volumes:
-      - ./devices:/tmp/devices
       - ../../example:/tmp/plugin
     environment:
-      PLUGIN_DEVICE_PATH: /tmp/devices
       PLUGIN_CONFIG: /tmp/plugin
     links:
       - ipmisim

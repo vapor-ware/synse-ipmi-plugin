@@ -5,15 +5,13 @@ import (
 	"strings"
 
 	"github.com/vapor-ware/goipmi"
-	"github.com/vapor-ware/synse-ipmi-plugin/protocol"
+	"github.com/vapor-ware/synse-ipmi-plugin/pkg/protocol"
 	"github.com/vapor-ware/synse-sdk/sdk"
 )
 
-// BmcPower is the handler for the bmc-power device.
-var BmcPower = sdk.DeviceHandler{
-	Type:  "power",
-	Model: "bmc-power",
-
+// ChassisPower is the handler for the bmc-power device.
+var ChassisPower = sdk.DeviceHandler{
+	Name:  "chassis.power",
 	Read:  bmcPowerRead,
 	Write: bmcPowerWrite,
 }
@@ -25,16 +23,20 @@ func bmcPowerRead(device *sdk.Device) ([]*sdk.Reading, error) {
 		return nil, err
 	}
 
-	readings := []*sdk.Reading{
-		sdk.NewReading("state", state),
+	powerState, err := device.GetOutput("chassis.power.state").MakeReading(state)
+	if err != nil {
+		return nil, err
 	}
-	return readings, nil
+
+	return []*sdk.Reading{
+		powerState,
+	}, nil
 }
 
 // bmcPowerWrite is the write handler function for bmc-power devices.
 func bmcPowerWrite(device *sdk.Device, data *sdk.WriteData) error {
 	action := data.Action
-	raw := data.Raw
+	raw := data.Data
 
 	// When writing to a BMC Power device, we always expect there to be
 	// raw data specified. If there isn't, we return an error.
@@ -43,7 +45,7 @@ func bmcPowerWrite(device *sdk.Device, data *sdk.WriteData) error {
 	}
 
 	if action == "state" {
-		cmd := string(raw[0])
+		cmd := string(raw)
 
 		var state ipmi.ChassisControl
 		switch strings.ToLower(cmd) {
