@@ -1,4 +1,5 @@
 [![CircleCI](https://circleci.com/gh/vapor-ware/synse-ipmi-plugin.svg?style=shield)](https://circleci.com/gh/vapor-ware/synse-ipmi-plugin)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fvapor-ware%2Fsynse-ipmi-plugin.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fvapor-ware%2Fsynse-ipmi-plugin?ref=badge_shield)
 
 # Synse IPMI Plugin
 A general-purpose IPMI plugin for [Synse Server][synse-server].
@@ -176,3 +177,6 @@ The Synse IPMI Plugin, and all other components of the Synse ecosystem, is relea
 [plugin-dockerhub]: https://hub.docker.com/r/vaporio/ipmi-plugin
 [plugin-release]: https://github.com/vapor-ware/synse-ipmi-plugin/releases
 [sdk-config-docs]: http://synse-sdk.readthedocs.io/en/latest/user/configuration.html
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fvapor-ware%2Fsynse-ipmi-plugin.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fvapor-ware%2Fsynse-ipmi-plugin?ref=badge_large)
