@@ -3,8 +3,7 @@
 #
 
 PLUGIN_NAME    := ipmi
-PLUGIN_VERSION := 0.2.1-dev
-#PLUGIN_VERSION := 0.2.0-alpha
+PLUGIN_VERSION := 0.2.0-alpha
 IMAGE_NAME     := vaporio/ipmi-plugin
 
 GIT_COMMIT ?= $(shell git rev-parse --short HEAD 2> /dev/null || true)
@@ -123,7 +122,7 @@ ifndef HAS_GOX
 endif
 	@ # We currently only use a couple of images; the built set of images can be
 	@ # updated if we ever need to support more os/arch combinations
-	gox --output="build/${PKG_NAME}_{{.OS}}_{{.Arch}}" \
+	gox --output="build/${PLUGIN_NAME}_{{.OS}}_{{.Arch}}" \
 		--ldflags "${LDFLAGS}" \
 		--osarch='linux/amd64 darwin/amd64' \
 		github.com/vapor-ware/synse-ipmi-plugin
