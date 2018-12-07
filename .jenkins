@@ -1,0 +1,161 @@
+#!/usr/bin/env groovy
+
+pipeline {
+
+  agent any
+
+  environment {
+    PROJ_PATH = '/go/src/github.com/vapor-ware/synse-ipmi-plugin'
+    IMAGE_NAME = 'vaporio/ipmi-plugin'
+
+    // FIXME: for testing release flow
+    TAG_NAME = '0.2.1-dev'
+  }
+
+  stages {
+    stage('Checkout') {
+      steps {
+        checkout scm
+      }
+    }
+
+    // This stage is done first in order to get the vendored dependencies
+    // if they do not already exist. This should improve the build time of
+    // all subsequent stages which require the vendored dependencies to
+    // exist (e.g. testing, building)
+    stage('Vendor Dependencies') {
+      agent {
+        docker {
+          image 'vaporio/golang:1.11'
+          reuseNode true
+        }
+      }
+      steps {
+        // Set up the project in the docker container. The project must be
+        // on the GOPATH (/go) in order to correctly vendor dependencies and
+        // build the project artifacts.
+        sh 'mkdir -p ${PROJ_PATH} && cp -r ${WORKSPACE}/* ${PROJ_PATH}'
+
+        // The pipeline's 'dir()' directive is broken when run inside a docker
+        // container, so we need to 'cd' into the project directory prior to
+        // running the required commands.
+        sh 'cd ${PROJ_PATH} && make dep'
+
+        // Copy the vendor directory back down to the WORKSPACE, since it is
+        // volume mounted. This way all subsequent stages will have the
+        // project already vendored.
+        sh 'mkdir -p ${WORKSPACE}/vendor'
+        sh 'cp -r ${PROJ_PATH}/vendor/* ${WORKSPACE}/vendor'
+      }
+    }
+
+    // Run linting on project source code.
+    stage('Lint') {
+      agent {
+        docker {
+          image 'vaporio/golang:1.11'
+          reuseNode true
+        }
+      }
+      steps {
+        // Set up the project in the docker container. The project must be
+        // on the GOPATH (/go) in order to correctly vendor dependencies and
+        // build the project artifacts.
+        sh 'mkdir -p ${PROJ_PATH} && cp -r ${WORKSPACE}/* ${PROJ_PATH}'
+
+        // The pipeline's 'dir()' directive is broken when run inside a docker
+        // container, so we need to 'cd' into the project directory prior to
+        // running the required commands.
+        sh 'cd ${PROJ_PATH} && make lint'
+      }
+    }
+
+    // Verify that the Docker image builds successfully.
+    stage('Build Image') {
+      steps {
+        sh 'make docker'
+      }
+    }
+
+    // Build the image with the 'edge' tag and publish it to DockerHub. This
+    // should only be run on the master branch (e.g. PR merge)
+    stage('Publish Edge Image') {
+      when {
+        branch 'master'
+      }
+      steps {
+        withDockerRegistry(registry: [credentialsId: 'vio-docker-hub']) {
+          sh './bin/ci/build_and_publish.sh edge'
+        }
+      }
+    }
+
+    // Build artifacts for the GitHub Release.
+    stage('Build Release Artifacts') {
+      agent {
+        docker {
+          image 'vaporio/golang:1.11'
+          reuseNode true
+        }
+      }
+      when {
+        // example matches: 1.2.3, 1.2.3-dev
+        //tag pattern: '(0|[1-9]*)\\.(0|[1-9]*)\\.(0|[1-9]*)(-(\\S*))?$', comparator: "REGEXP"
+        branch 'jenkins-ci'
+      }
+      steps {
+        // Set up the project in the docker container. The project must be
+        // on the GOPATH (/go) in order to correctly vendor dependencies and
+        // build the project artifacts.
+        sh 'mkdir -p ${PROJ_PATH} && cp -r ${WORKSPACE}/* ${PROJ_PATH}'
+
+        // Build the project artifacts
+        sh 'mkdir -p ${WORKSPACE}/build'
+        sh 'make ci-build'
+      }
+    }
+
+    // Generate a new release draft on GitHub for a tag matching a version string
+    // pattern. The release will include an auto-generated changelog and build
+    // artifacts.
+    stage('Draft GitHub Release') {
+      when {
+        // example matches: 1.2.3, 1.2.3-dev
+        //tag pattern: '(0|[1-9]*)\\.(0|[1-9]*)\\.(0|[1-9]*)(-(\\S*))?$', comparator: "REGEXP"
+        branch 'jenkins-ci'
+      }
+      environment {
+        GITHUB_USER = 'vapor-ware'
+        GITHUB_TOKEN = credentials('1de2c61b-4188-478b-bc65-42b0df860163')
+        GITHUB_REPONAME = 'synse-ipmi-plugin'
+      }
+      steps {
+        sh 'make ci-check-version'
+
+        // Auto-generate a changelog for the release
+        sh './bin/ci/generate_changelog.sh'
+
+        // Create the release
+        sh 'docker pull edaniszewski/ghr'
+        sh 'docker run --rm -v ${WORKSPACE}:/repo edaniszewski/ghr -u ${GITHUB_USER} -r ${GITHUB_REPONAME} -t ${GITHUB_TOKEN} -b "$(cat ./CHANGELOG.md)" -replace -draft ${TAG_NAME} build/'
+      }
+    }
+
+    // Build the image with the release tags and publish it to Dockerhub. This
+    // should only be run on a git tag matching a version string pattern. This
+    // should only run if the "Draft GitHub Release" stage completed successfully.
+    stage('Publish Release Images') {
+      when {
+        // example matches: 1.2.3, 1.2.3-dev
+        //tag pattern: '(0|[1-9]*)\\.(0|[1-9]*)\\.(0|[1-9]*)(-(\\S*))?$', comparator: "REGEXP"
+        branch 'jenkins-ci'
+      }
+      steps {
+        sh 'make ci-check-version'
+        withDockerRegistry(registry: [credentialsId: 'vio-docker-hub']) {
+          sh './bin/ci/build_and_publish.sh latest-dev'
+        }
+      }
+    }
+  }
+}

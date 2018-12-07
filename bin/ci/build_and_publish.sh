@@ -8,12 +8,12 @@
 #
 # The CI environment should provide the following environment variables:
 #   IMAGE_NAME: The name of the Docker image (without tags)
-#   CIRCLE_TAG: The name of the git tag
+#   TAG_NAME:   The name of the git tag
 #
 # All arguments passed to the script should be tags for the $IMAGE_NAME.
-# If $CIRCLE_TAG exists, it will be parsed to generate the tags for all
+# If $TAG_NAME exists, it will be parsed to generate the tags for all
 # appropriate versions. For example:
-#   CIRCLE_TAG  ->  IMAGE TAGS
+#   TAG_NAME    ->  IMAGE TAGS
 #   1           ->  1
 #   1.2         ->  1, 1.2
 #   1.2.3       ->  1, 1.2, 1.2.3
@@ -30,15 +30,15 @@ echo "Building and Publishing Images"
 
 declare -a tags
 
-if [ "${CIRCLE_TAG}" ]; then
-    echo "Found CIRCLE_TAG: ${CIRCLE_TAG}"
+if [ "${TAG_NAME}" ]; then
+    echo "Found TAG_NAME: ${TAG_NAME}"
 
     # First, search for "-" in the tag. This would be the case for tags
     # with suffixes, e.g. "1-dev", "1.2.3-rc0". If a suffix is present,
     # then we will not generate additional image tags.
-    suffix_count=$(awk -F- '{print NF-1}' <<< "${CIRCLE_TAG}")
+    suffix_count=$(awk -F- '{print NF-1}' <<< "${TAG_NAME}")
     if [ ${suffix_count} -eq 0 ]; then
-        IFS='.' read -r -a array <<< "${CIRCLE_TAG}"
+        IFS='.' read -r -a array <<< "${TAG_NAME}"
 
         major="${array[0]}"
         minor="${array[1]}"
@@ -56,15 +56,15 @@ if [ "${CIRCLE_TAG}" ]; then
     fi
 
     if [ "${tags}" ]; then
-        echo "Created image tags from CIRCLE_TAG: ${tags[@]}"
+        echo "Created image tags from TAG_NAME: ${tags[@]}"
     else
-        echo "No image tags created from CIRCLE_TAG"
+        echo "No image tags created from TAG_NAME"
     fi
 
-    # Add the CIRCLE_TAG to the tags. In some cases, this may duplicate
+    # Add the TAG_NAME to the tags. In some cases, this may duplicate
     # a tag, but building with the same tag should just use the cache
     # and not cause any problems.
-    tags+=("${CIRCLE_TAG}")
+    tags+=("${TAG_NAME}")
 fi
 
 
