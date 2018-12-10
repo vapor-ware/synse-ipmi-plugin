@@ -1,4 +1,4 @@
-[![CircleCI](https://circleci.com/gh/vapor-ware/synse-ipmi-plugin.svg?style=shield)](https://circleci.com/gh/vapor-ware/synse-ipmi-plugin)
+[![Build Status](https://build.vio.sh/buildStatus/icon?job=vapor-ware/synse-ipmi-plugin/master)](https://build.vio.sh/blue/organizations/jenkins/vapor-ware%2Fsynse-ipmi-plugin/activity)
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fvapor-ware%2Fsynse-ipmi-plugin.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fvapor-ware%2Fsynse-ipmi-plugin?ref=badge_shield)
 
 # Synse IPMI Plugin
