@@ -7,9 +7,6 @@ pipeline {
   environment {
     PROJ_PATH = '/go/src/github.com/vapor-ware/synse-ipmi-plugin'
     IMAGE_NAME = 'vaporio/ipmi-plugin'
-
-    // FIXME: for testing release flow
-    TAG_NAME = '0.2.1-dev'
   }
 
   stages {
