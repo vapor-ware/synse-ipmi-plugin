@@ -6,6 +6,7 @@ import (
 
 	"github.com/vapor-ware/synse-ipmi-plugin/pkg/protocol"
 	"github.com/vapor-ware/synse-sdk/sdk"
+	"github.com/vapor-ware/synse-sdk/sdk/output"
 )
 
 // ChassisLed is the handler for the bmc-boot-target device.
@@ -25,18 +26,17 @@ var ChassisLed = sdk.DeviceHandler{
 }
 
 // bmcChassisLedRead is the read handler function for bmc-chassis-led devices.
-func bmcChassisLedRead(device *sdk.Device) ([]*sdk.Reading, error) {
+func bmcChassisLedRead(device *sdk.Device) ([]*output.Reading, error) {
 	state, err := protocol.GetChassisIdentify(device.Data)
 	if err != nil {
 		return nil, err
 	}
 
-	chassisIdentify, err := device.GetOutput("chassis.led.state").MakeReading(state)
-	if err != nil {
-		return nil, err
-	}
+	chassisIdentify := output.State.MakeReading(state).WithContext(map[string]string{
+		"info": "chassis identify led",
+	})
 
-	return []*sdk.Reading{
+	return []*output.Reading{
 		chassisIdentify,
 	}, nil
 }

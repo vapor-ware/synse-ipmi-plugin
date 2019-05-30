@@ -1,9 +1,8 @@
 package protocol
 
 import (
-	"github.com/vapor-ware/goipmi"
-
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
+	ipmi "github.com/vapor-ware/goipmi"
 )
 
 const (

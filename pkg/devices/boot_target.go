@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"strings"
 
-	log "github.com/Sirupsen/logrus"
-
-	"github.com/vapor-ware/goipmi"
+	log "github.com/sirupsen/logrus"
+	ipmi "github.com/vapor-ware/goipmi"
 	"github.com/vapor-ware/synse-ipmi-plugin/pkg/protocol"
 	"github.com/vapor-ware/synse-sdk/sdk"
+	"github.com/vapor-ware/synse-sdk/sdk/output"
 )
 
 // ChassisBootTarget is the handler for the bmc-boot-target device.
@@ -19,18 +19,17 @@ var ChassisBootTarget = sdk.DeviceHandler{
 }
 
 // bmcBootTargetRead is the read handler function for bmc-boot-target devices.
-func bmcBootTargetRead(device *sdk.Device) ([]*sdk.Reading, error) {
+func bmcBootTargetRead(device *sdk.Device) ([]*output.Reading, error) {
 	target, err := protocol.GetChassisBootTarget(device.Data)
 	if err != nil {
 		return nil, err
 	}
 
-	bootTarget, err := device.GetOutput("chassis.boot.target").MakeReading(target)
-	if err != nil {
-		return nil, err
-	}
+	bootTarget := output.Status.MakeReading(target).WithContext(map[string]string{
+		"info": "boot target",
+	})
 
-	return []*sdk.Reading{
+	return []*output.Reading{
 		bootTarget,
 	}, nil
 }

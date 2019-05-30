@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/vapor-ware/goipmi"
+	ipmi "github.com/vapor-ware/goipmi"
 	"github.com/vapor-ware/synse-ipmi-plugin/pkg/protocol"
 	"github.com/vapor-ware/synse-sdk/sdk"
+	"github.com/vapor-ware/synse-sdk/sdk/output"
 )
 
 // ChassisPower is the handler for the bmc-power device.
@@ -17,18 +18,17 @@ var ChassisPower = sdk.DeviceHandler{
 }
 
 // bmcPowerRead is the read handler function for bmc-power devices.
-func bmcPowerRead(device *sdk.Device) ([]*sdk.Reading, error) {
+func bmcPowerRead(device *sdk.Device) ([]*output.Reading, error) {
 	state, err := protocol.GetChassisPowerState(device.Data)
 	if err != nil {
 		return nil, err
 	}
 
-	powerState, err := device.GetOutput("chassis.power.state").MakeReading(state)
-	if err != nil {
-		return nil, err
-	}
+	powerState := output.State.MakeReading(state).WithContext(map[string]string{
+		"info": "chassis power state",
+	})
 
-	return []*sdk.Reading{
+	return []*output.Reading{
 		powerState,
 	}, nil
 }

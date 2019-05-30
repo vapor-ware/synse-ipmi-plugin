@@ -2,7 +2,7 @@ package protocol
 
 import (
 	"github.com/mitchellh/mapstructure"
-	"github.com/vapor-ware/goipmi"
+	ipmi "github.com/vapor-ware/goipmi"
 )
 
 // newClientFromConfig is a utility function to create a new IPMI client
