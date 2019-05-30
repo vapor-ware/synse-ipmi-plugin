@@ -3,10 +3,10 @@ package pkg
 import (
 	"fmt"
 
-	log "github.com/Sirupsen/logrus"
 	"github.com/mitchellh/mapstructure"
-	"github.com/vapor-ware/goipmi"
-	"github.com/vapor-ware/synse-sdk/sdk"
+	log "github.com/sirupsen/logrus"
+	ipmi "github.com/vapor-ware/goipmi"
+	"github.com/vapor-ware/synse-sdk/sdk/config"
 )
 
 // deviceIdentifier defines the IPMI-specific way of uniquely identifying a device
@@ -25,7 +25,7 @@ func deviceIdentifier(data map[string]interface{}) string {
 // Currently, this will not scan the SDR or otherwise search for devices exposed
 // by the BMC. Instead, it will just create a few higher-level devices for chassis
 // control for each configured BMC.
-func dynamicDeviceConfig(data map[string]interface{}) ([]*sdk.DeviceConfig, error) {
+func dynamicDeviceConfig(data map[string]interface{}) ([]*config.DeviceProto, error) {
 
 	// FIXME (etd): creating the connection and the client here are not totally
 	// necessary right now other than to validate that the Connection info is
@@ -47,82 +47,69 @@ func dynamicDeviceConfig(data map[string]interface{}) ([]*sdk.DeviceConfig, erro
 
 	// Make new power device for the BMC. This device would be akin to
 	// `ipmitool [options] chassis power ...` commands.
-	cfg := sdk.DeviceConfig{
-		SchemeVersion: sdk.SchemeVersion{Version: "1.0"},
-		Locations: []*sdk.LocationConfig{
-			{
-				Name:  "ipmi",
-				Rack:  &sdk.LocationData{Name: "ipmi"},
-				Board: &sdk.LocationData{Name: conn.Hostname},
+	cfg := []*config.DeviceProto{
+		{
+			Type: "power",
+			Metadata: map[string]string{
+				"location": "chassis",
+			},
+			Handler: "chassis.power",
+			Instances: []*config.DeviceInstance{
+				{
+					Info: "BMC chassis power",
+					Data: map[string]interface{}{
+						// FIXME (etd): is there anything unique that we can use instead of hardcoding?
+						// if not, find a better way than manually specifying ids...
+						"path":      conn.Path,
+						"hostname":  conn.Hostname,
+						"port":      conn.Port,
+						"username":  conn.Username,
+						"password":  conn.Password,
+						"interface": conn.Interface,
+					},
+				},
 			},
 		},
-		Devices: []*sdk.DeviceKind{
-			{
-				Name: "chassis.power",
-				Outputs: []*sdk.DeviceOutput{
-					{Type: "chassis.power.state"},
-				},
-				Instances: []*sdk.DeviceInstance{
-					{
-						Info:     "BMC chassis power",
-						Location: "ipmi",
-						Data: map[string]interface{}{
-							// FIXME (etd): is there anything unique that we can use instead of hardcoding?
-							// if not, find a better way than manually specifying ids...
-							"path":      conn.Path,
-							"hostname":  conn.Hostname,
-							"port":      conn.Port,
-							"username":  conn.Username,
-							"password":  conn.Password,
-							"interface": conn.Interface,
-						},
+		{
+			Type:    "boot_target",
+			Handler: "boot_target",
+			Instances: []*config.DeviceInstance{
+				{
+					Info: "BMC boot target",
+					Data: map[string]interface{}{
+						"id":        "2", // FIXME (etd): see above
+						"path":      conn.Path,
+						"hostname":  conn.Hostname,
+						"port":      conn.Port,
+						"username":  conn.Username,
+						"password":  conn.Password,
+						"interface": conn.Interface,
 					},
 				},
 			},
-			{
-				Name: "boot_target",
-				Outputs: []*sdk.DeviceOutput{
-					{Type: "chassis.boot.target"},
-				},
-				Instances: []*sdk.DeviceInstance{
-					{
-						Info:     "BMC chassis boot target",
-						Location: "ipmi",
-						Data: map[string]interface{}{
-							"id":        "2", // FIXME (etd): see above
-							"path":      conn.Path,
-							"hostname":  conn.Hostname,
-							"port":      conn.Port,
-							"username":  conn.Username,
-							"password":  conn.Password,
-							"interface": conn.Interface,
-						},
-					},
-				},
+		},
+		{
+			Type: "led",
+			Metadata: map[string]string{
+				"location": "chassis",
 			},
-			{
-				Name: "chassis.led",
-				Outputs: []*sdk.DeviceOutput{
-					{Type: "chassis.led.state"},
-				},
-				Instances: []*sdk.DeviceInstance{
-					{
-						Info:     "BMC chassis identify LED",
-						Location: "ipmi",
-						Data: map[string]interface{}{
-							"id":        "3", // FIXME (etd): see above
-							"path":      conn.Path,
-							"hostname":  conn.Hostname,
-							"port":      conn.Port,
-							"username":  conn.Username,
-							"password":  conn.Password,
-							"interface": conn.Interface,
-						},
+			Handler: "chassis.led",
+			Instances: []*config.DeviceInstance{
+				{
+					Info: "BMC chassis identify LED",
+					Data: map[string]interface{}{
+						"id":        "3", // FIXME (etd): see above
+						"path":      conn.Path,
+						"hostname":  conn.Hostname,
+						"port":      conn.Port,
+						"username":  conn.Username,
+						"password":  conn.Password,
+						"interface": conn.Interface,
 					},
 				},
 			},
 		},
 	}
 
-	return []*sdk.DeviceConfig{&cfg}, nil
+	return cfg, nil
 }

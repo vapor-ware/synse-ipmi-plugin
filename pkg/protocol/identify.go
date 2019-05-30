@@ -3,9 +3,8 @@ package protocol
 import (
 	"fmt"
 
-	log "github.com/Sirupsen/logrus"
-
-	"github.com/vapor-ware/goipmi"
+	log "github.com/sirupsen/logrus"
+	ipmi "github.com/vapor-ware/goipmi"
 )
 
 // FIXME - now that we have a fork of goipmi, some of this stuff should
