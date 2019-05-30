@@ -1,37 +1,32 @@
 package pkg
 
 import (
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 	"github.com/vapor-ware/synse-ipmi-plugin/pkg/devices"
-	"github.com/vapor-ware/synse-ipmi-plugin/pkg/outputs"
 	"github.com/vapor-ware/synse-sdk/sdk"
-	"github.com/vapor-ware/synse-sdk/sdk/policies"
 )
 
 // MakePlugin creates a new instance of the IPMI plugin.
 func MakePlugin() *sdk.Plugin {
-	plugin := sdk.NewPlugin(
+	plugin, err := sdk.NewPlugin(
 		sdk.CustomDeviceIdentifier(deviceIdentifier),
 		sdk.CustomDynamicDeviceConfigRegistration(dynamicDeviceConfig),
-	)
-
-	policies.Add(policies.DeviceConfigDynamicRequired)
-	policies.Add(policies.DeviceConfigFileOptional)
-
-	err := plugin.RegisterOutputTypes(
-		&outputs.ChassisBootTarget,
-		&outputs.ChassisLedState,
-		&outputs.ChassisPowerState,
+		sdk.DeviceConfigOptional(),
+		sdk.DynamicConfigRequired(),
 	)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	plugin.RegisterDeviceHandlers(
+	// Register device handlers.
+	err = plugin.RegisterDeviceHandlers(
 		&devices.ChassisBootTarget,
 		&devices.ChassisLed,
 		&devices.ChassisPower,
 	)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	return plugin
 }

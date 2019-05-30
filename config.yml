@@ -1,16 +1,13 @@
 #
-# config.yml
+# config.yaml
 #
-# A basic plugin configuration for the Synse IPMI Plugin. This
-# config is the default configuration file used in the Docker
-# image for the plugin.
+# A bare-bones example configuration for the IPMI plugin.
 #
-# With this configuration file, the plugin will not do anything,
-# as there are no BMCs being configured. It is up to the user to
-# supply their own configuration.
-#
-version: 1.0
+
+version: 3
 debug: true
+id:
+  useMachineID: false
 network:
   type: tcp
   address: ":5001"

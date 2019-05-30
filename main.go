@@ -1,7 +1,7 @@
 package main
 
 import (
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/vapor-ware/synse-ipmi-plugin/pkg"
 	"github.com/vapor-ware/synse-sdk/sdk"
@@ -10,13 +10,13 @@ import (
 const (
 	pluginName       = "ipmi"
 	pluginMaintainer = "vaporio"
-	pluginDesc       = "A general-purpose IPMI plugin"
+	pluginDesc       = "A simple general-purpose IPMI plugin"
 	pluginVcs        = "https://github.com/vapor-ware/synse-ipmi-plugin"
 )
 
 func main() {
 	// Set the plugin metadata
-	sdk.SetPluginMeta(
+	sdk.SetPluginInfo(
 		pluginName,
 		pluginMaintainer,
 		pluginDesc,

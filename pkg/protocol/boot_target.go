@@ -1,9 +1,8 @@
 package protocol
 
 import (
-	log "github.com/Sirupsen/logrus"
-
-	"github.com/vapor-ware/goipmi"
+	log "github.com/sirupsen/logrus"
+	ipmi "github.com/vapor-ware/goipmi"
 )
 
 // GetChassisBootTarget gets the current boot device for the chassis.
