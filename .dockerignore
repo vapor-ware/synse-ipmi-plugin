@@ -17,6 +17,9 @@
 # CI
 .jenkins
 
+# Vendored Dependencies
+vendor/
+
 # Docs
 **/*.md
 **/*.rst
