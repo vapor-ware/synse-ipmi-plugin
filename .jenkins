@@ -23,7 +23,7 @@ pipeline {
     stage('Vendor Dependencies') {
       agent {
         docker {
-          image 'vaporio/golang:1.11'
+          image 'vaporio/golang:1.13'
           reuseNode true
         }
       }
@@ -50,7 +50,7 @@ pipeline {
     stage('Lint') {
       agent {
         docker {
-          image 'vaporio/golang:1.11'
+          image 'vaporio/golang:1.13'
           reuseNode true
         }
       }
@@ -91,7 +91,7 @@ pipeline {
     stage('Build Release Artifacts') {
       agent {
         docker {
-          image 'vaporio/golang:1.11'
+          image 'vaporio/golang:1.13'
           reuseNode true
         }
       }
