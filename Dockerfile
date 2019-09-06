@@ -1,7 +1,7 @@
 #
 # Builder Image
 #
-FROM vaporio/golang:1.11 as builder
+FROM vaporio/golang:1.13 as builder
 
 #
 # Final Image
