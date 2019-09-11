@@ -4,16 +4,17 @@ before:
   hooks:
     - go clean -v
     - rm -rf dist
+    - go mod download
 builds:
   - env:
       - CGO_ENABLED=0
     ldflags:
       - -w
-      - -X github.com/vapor-ware/synse-ipmi-plugin/vendor/github.com/vapor-ware/synse-sdk/sdk.BuildDate={{ .Date }}
-      - -X github.com/vapor-ware/synse-ipmi-plugin/vendor/github.com/vapor-ware/synse-sdk/sdk.GitCommit={{ .ShortCommit }}
-      - -X github.com/vapor-ware/synse-ipmi-plugin/vendor/github.com/vapor-ware/synse-sdk/sdk.GitTag={{ .Tag }}
-      - -X github.com/vapor-ware/synse-ipmi-plugin/vendor/github.com/vapor-ware/synse-sdk/sdk.GoVersion={{ .Env.GOVERSION }}
-      - -X github.com/vapor-ware/synse-ipmi-plugin/vendor/github.com/vapor-ware/synse-sdk/sdk.PluginVersion={{ .Version }}
+      - -X github.com/vapor-ware/synse-sdk/sdk.BuildDate={{ .Date }}
+      - -X github.com/vapor-ware/synse-sdk/sdk.GitCommit={{ .ShortCommit }}
+      - -X github.com/vapor-ware/synse-sdk/sdk.GitTag={{ .Tag }}
+      - -X github.com/vapor-ware/synse-sdk/sdk.GoVersion={{ .Env.GOVERSION }}
+      - -X github.com/vapor-ware/synse-sdk/sdk.PluginVersion={{ .Version }}
     goos:
       - linux
       - darwin

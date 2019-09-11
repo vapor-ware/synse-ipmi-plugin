@@ -12,7 +12,7 @@ GIT_TAG        ?= $(shell git describe --tags 2> /dev/null || true)
 BUILD_DATE     := $(shell date -u +%Y-%m-%dT%T 2> /dev/null)
 GO_VERSION     := $(shell go version | awk '{ print $$3 }')
 
-PKG_CTX := github.com/vapor-ware/synse-ipmi-plugin/vendor/github.com/vapor-ware/synse-sdk/sdk
+PKG_CTX := github.com/vapor-ware/synse-sdk/sdk
 LDFLAGS := -w \
 	-X ${PKG_CTX}.BuildDate=${BUILD_DATE} \
 	-X ${PKG_CTX}.GitCommit=${GIT_COMMIT} \
@@ -33,10 +33,6 @@ build-linux:  ## Build the plugin binarry for linux amd64
 clean:  ## Remove temporary files
 	go clean -v
 	rm -rf dist
-
-.PHONY: dep
-dep:  ## Ensure and prune dependencies
-	dep ensure -v
 
 .PHONY: docker
 docker:  ## Build the docker image
