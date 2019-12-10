@@ -50,7 +50,7 @@ func dynamicDeviceConfig(data map[string]interface{}) ([]*config.DeviceProto, er
 	cfg := []*config.DeviceProto{
 		{
 			Type: "power",
-			Metadata: map[string]string{
+			Context: map[string]string{
 				"location": "chassis",
 			},
 			Handler: "chassis.power",
@@ -90,7 +90,7 @@ func dynamicDeviceConfig(data map[string]interface{}) ([]*config.DeviceProto, er
 		},
 		{
 			Type: "led",
-			Metadata: map[string]string{
+			Context: map[string]string{
 				"location": "chassis",
 			},
 			Handler: "chassis.led",
