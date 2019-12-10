@@ -4,13 +4,14 @@
 # Simple deployment of Synse Server, Synse IPMI Plugin, and an
 # IPMI simulator as backing for the IPMI Plugin.
 #
-version: "3"
+
+version: '3'
 services:
   synse-server:
     container_name: synse-server
     image: vaporio/synse-server
     ports:
-      - 5000:5000
+      - '5000:5000'
     environment:
       SYNSE_PLUGIN_TCP: ipmi-plugin:5001
     links:
@@ -20,7 +21,7 @@ services:
     container_name: ipmi-plugin
     image: vaporio/ipmi-plugin
     ports:
-      - 5001:5001
+      - '5001:5001'
     volumes:
       - ../../example:/tmp/plugin
     environment:
@@ -32,4 +33,4 @@ services:
     container_name: ipmisim
     image: vaporio/ipmi-simulator
     ports:
-      - 623:623/udp
+      - '623:623/udp'

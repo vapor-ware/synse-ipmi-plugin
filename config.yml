@@ -6,8 +6,6 @@
 
 version: 3
 debug: true
-id:
-  useMachineID: false
 network:
   type: tcp
   address: ":5001"
