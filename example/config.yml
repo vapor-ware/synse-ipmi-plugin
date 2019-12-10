@@ -8,6 +8,7 @@
 # A different configuration YAML should be used for production
 # deployments.
 #
+
 version: 1.0
 debug: true
 network:
