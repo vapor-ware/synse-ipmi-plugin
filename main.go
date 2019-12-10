@@ -2,7 +2,6 @@ package main
 
 import (
 	log "github.com/sirupsen/logrus"
-
 	"github.com/vapor-ware/synse-ipmi-plugin/pkg"
 	"github.com/vapor-ware/synse-sdk/sdk"
 )
