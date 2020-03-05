@@ -16,6 +16,10 @@ var ChassisBootTarget = sdk.DeviceHandler{
 	Name:  "boot_target",
 	Read:  bmcBootTargetRead,
 	Write: bmcBootTargetWrite,
+
+	Actions: []string{
+		"target",
+	},
 }
 
 // bmcBootTargetRead is the read handler function for bmc-boot-target devices.
