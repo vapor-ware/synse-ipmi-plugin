@@ -15,6 +15,10 @@ var ChassisPower = sdk.DeviceHandler{
 	Name:  "chassis.power",
 	Read:  bmcPowerRead,
 	Write: bmcPowerWrite,
+
+	Actions: []string{
+		"state",
+	},
 }
 
 // bmcPowerRead is the read handler function for bmc-power devices.
