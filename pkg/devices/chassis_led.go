@@ -23,6 +23,10 @@ var ChassisLed = sdk.DeviceHandler{
 	Name:  "chassis.led",
 	Read:  bmcChassisLedRead,
 	Write: bmcChassisLedWrite,
+
+	Actions: []string{
+		"state",
+	},
 }
 
 // bmcChassisLedRead is the read handler function for bmc-chassis-led devices.
