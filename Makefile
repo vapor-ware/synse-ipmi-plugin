@@ -3,7 +3,7 @@
 #
 
 PLUGIN_NAME    := ipmi
-PLUGIN_VERSION := 3.0.0-alpha
+PLUGIN_VERSION := 3.0.0-alpha.1
 IMAGE_NAME     := vaporio/ipmi-plugin
 BIN_NAME       := synse-ipmi-plugin
 
@@ -32,7 +32,7 @@ build-linux:  ## Build the plugin binarry for linux amd64
 .PHONY: clean
 clean:  ## Remove temporary files
 	go clean -v
-	rm -rf dist
+	rm -rf dist coverage.out ${BIN_NAME}
 
 .PHONY: docker
 docker:  ## Build the docker image
