@@ -6,12 +6,7 @@ import (
 )
 
 // GetChassisBootTarget gets the current boot device for the chassis.
-func GetChassisBootTarget(config map[string]interface{}) (string, error) {
-	client, err := newClientFromConfig(config)
-	if err != nil {
-		return "", err
-	}
-
+func GetChassisBootTarget(client *ipmi.Client) (string, error) {
 	request := &ipmi.Request{
 		NetworkFunction: ipmi.NetworkFunctionChassis,
 		Command:         ipmi.CommandGetSystemBootOptions,
@@ -21,8 +16,7 @@ func GetChassisBootTarget(config map[string]interface{}) (string, error) {
 	}
 	response := &ipmi.SystemBootOptionsResponse{}
 
-	err = client.Send(request, response)
-	if err != nil {
+	if err := client.Send(request, response); err != nil {
 		return "", err
 	}
 
@@ -34,12 +28,7 @@ func GetChassisBootTarget(config map[string]interface{}) (string, error) {
 }
 
 // SetChassisBootTarget sets the boot device for the chassis.
-func SetChassisBootTarget(config map[string]interface{}, target ipmi.BootDevice) error {
-	client, err := newClientFromConfig(config)
-	if err != nil {
-		return err
-	}
-
+func SetChassisBootTarget(client *ipmi.Client, target ipmi.BootDevice) error {
 	log.WithFields(log.Fields{
 		"target": target.String(),
 	}).Info("[ipmi] setting chassis boot target")
