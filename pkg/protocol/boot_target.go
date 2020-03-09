@@ -39,6 +39,9 @@ func SetChassisBootTarget(config map[string]interface{}, target ipmi.BootDevice)
 	if err != nil {
 		return err
 	}
-	log.Debugf("Setting boot target to: %s", target.String())
+
+	log.WithFields(log.Fields{
+		"target": target.String(),
+	}).Info("[ipmi] setting chassis boot target")
 	return client.SetBootDevice(target)
 }

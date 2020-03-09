@@ -10,27 +10,25 @@ services:
   synse-server:
     container_name: synse-server
     image: vaporio/synse-server
-    ports:
-      - '5000:5000'
     environment:
       SYNSE_PLUGIN_TCP: ipmi-plugin:5001
+    ports:
+    - '5000:5000'
     links:
-      - ipmi-plugin
+    - ipmi-plugin
 
   ipmi-plugin:
     container_name: ipmi-plugin
     image: vaporio/ipmi-plugin
     ports:
-      - '5001:5001'
+    - '5001:5001'
     volumes:
-      - ../../example:/tmp/plugin
-    environment:
-      PLUGIN_CONFIG: /tmp/plugin
+    - ./plugin.yml:/etc/synse/plugin/config/config.yaml
     links:
-      - ipmisim
+    - ipmisim
 
   ipmisim:
     container_name: ipmisim
     image: vaporio/ipmi-simulator
     ports:
-      - '623:623/udp'
+    - '623:623/udp'

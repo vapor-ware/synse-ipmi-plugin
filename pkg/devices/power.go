@@ -28,12 +28,10 @@ func bmcPowerRead(device *sdk.Device) ([]*output.Reading, error) {
 		return nil, err
 	}
 
-	powerState := output.State.MakeReading(state).WithContext(map[string]string{
-		"info": "chassis power state",
-	})
-
 	return []*output.Reading{
-		powerState,
+		output.State.MakeReading(state).WithContext(map[string]string{
+			"info": "chassis power state",
+		}),
 	}, nil
 }
 

@@ -1,5 +1,5 @@
 #
-# config.yml
+# plugin.yml
 #
 # Sample plugin configuration for the Synse IPMI Plugin. This
 # plugin configuration is used for the example deployment and
@@ -9,17 +9,19 @@
 # deployments.
 #
 
-version: 1.0
+version: 3
 debug: true
 network:
   type: tcp
-  address: ":5001"
+  address: ':5001'
 settings:
   mode: parallel
   read:
     interval: 3s
   write:
     interval: 1s
+  listen:
+    disable: true
 dynamicRegistration:
   config:
     - hostname: ipmisim

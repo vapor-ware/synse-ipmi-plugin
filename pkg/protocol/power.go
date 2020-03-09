@@ -40,6 +40,10 @@ func GetChassisPowerState(config map[string]interface{}) (string, error) {
 		state = "off"
 	}
 
+	log.WithFields(log.Fields{
+		"state":  state,
+	}).Debug("[ipmi] got chassis power state")
+
 	return state, nil
 }
 
@@ -50,6 +54,8 @@ func SetChassisPowerState(config map[string]interface{}, control ipmi.ChassisCon
 		return err
 	}
 
-	log.Debugf("Setting power state to: %s", control.String())
+	log.WithFields(log.Fields{
+		"state":  control.String(),
+	}).Info("[ipmi] setting chassis power state")
 	return client.Control(control)
 }
