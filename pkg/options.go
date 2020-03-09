@@ -32,15 +32,20 @@ func dynamicDeviceConfig(data map[string]interface{}) ([]*config.DeviceProto, er
 	// generally correct. We will need this later, e.g. when scanning the SDR
 	// for devices.
 	conn := &ipmi.Connection{}
-	err := mapstructure.Decode(data, conn)
-	if err != nil {
+	if err := mapstructure.Decode(data, conn); err != nil {
 		return nil, err
 	}
 
-	log.Debugf("Connection: %+v", conn)
+	log.WithFields(log.Fields{
+		"interface": conn.Interface,
+		"port":      conn.Port,
+		"path":      conn.Path,
+		"host":      conn.Hostname,
+		"user":      conn.Username,
+	}).Debug("[ipmi] creating connection from dynamic config")
 
 	// FIXME (etd): see the FIXME above - we do not currently use this.
-	_, err = ipmi.NewClient(conn)
+	_, err := ipmi.NewClient(conn)
 	if err != nil {
 		return nil, err
 	}

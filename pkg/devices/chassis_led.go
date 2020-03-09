@@ -36,12 +36,10 @@ func bmcChassisLedRead(device *sdk.Device) ([]*output.Reading, error) {
 		return nil, err
 	}
 
-	chassisIdentify := output.State.MakeReading(state).WithContext(map[string]string{
-		"info": "chassis identify led",
-	})
-
 	return []*output.Reading{
-		chassisIdentify,
+		output.State.MakeReading(state).WithContext(map[string]string{
+			"info": "chassis identify led",
+		}),
 	}, nil
 }
 

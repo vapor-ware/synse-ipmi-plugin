@@ -69,7 +69,7 @@ func GetIdentifyState(status *ipmi.ChassisStatusResponse) IdentifyState {
 // Identify issues a request to enable/disable the chassis identify device.
 func Identify(c *ipmi.Client, time int) error {
 	if time > 255 || time < 0 {
-		return fmt.Errorf("invalid time value: %d", time)
+		return fmt.Errorf("invalid time value: %d, must be between 0 and 255", time)
 	}
 
 	request := &ipmi.Request{
@@ -141,7 +141,10 @@ func SetChassisIdentify(config map[string]interface{}, state IdentifyState) erro
 		return fmt.Errorf("identify state unsupported for setting: %v", state)
 	}
 
-	log.Debugf("Setting chassis to identify for: %d seconds", time)
+	log.WithFields(log.Fields{
+		"duration": time,
+	}).Info("[ipmi] setting chassis identify")
+
 	return Identify(
 		client,
 		time,
