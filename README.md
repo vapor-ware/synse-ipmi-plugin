@@ -86,7 +86,7 @@ there is no need to specify device instance configuration files here.
 
 ### plugin config
 After reading through the docs linked above for the plugin config, take a look at the [example
-plugin config](example/config.yml). This can be used as a reference. To specify your own BMCs, you
+plugin config](example/plugin.yml). This can be used as a reference. To specify your own BMCs, you
 will need to list them under the `dynamicRegistration` field, e.g.
 
 ```yaml

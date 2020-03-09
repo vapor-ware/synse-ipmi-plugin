@@ -29,12 +29,10 @@ func bmcBootTargetRead(device *sdk.Device) ([]*output.Reading, error) {
 		return nil, err
 	}
 
-	bootTarget := output.Status.MakeReading(target).WithContext(map[string]string{
-		"info": "boot target",
-	})
-
 	return []*output.Reading{
-		bootTarget,
+		output.Status.MakeReading(target).WithContext(map[string]string{
+			"info": "boot target",
+		}),
 	}, nil
 }
 
@@ -54,42 +52,35 @@ func bmcBootTargetWrite(device *sdk.Device, data *sdk.WriteData) error {
 
 		var target ipmi.BootDevice
 
+		log.WithFields(log.Fields{
+			"target": strings.ToUpper(cmd),
+			"device": device.GetID(),
+		}).Info("[ipmi] setting boot target")
+
 		switch strings.ToLower(cmd) {
 		case "none":
-			log.Info("Setting Boot Target -> NONE")
 			target = ipmi.BootDeviceNone
 		case "pxe":
-			log.Info("Setting Boot Target -> PXE")
 			target = ipmi.BootDevicePxe
 		case "disk":
-			log.Info("Setting Boot Target -> DISK")
 			target = ipmi.BootDeviceDisk
 		case "safe":
-			log.Info("Setting Boot Target -> SAFE")
 			target = ipmi.BootDeviceSafe
 		case "diag":
-			log.Info("Setting Boot Target -> DIAG")
 			target = ipmi.BootDeviceDiag
 		case "cdrom":
-			log.Info("Setting Boot Target -> CDROM")
 			target = ipmi.BootDeviceCdrom
 		case "bios":
-			log.Info("Setting Boot Target -> BIOS")
 			target = ipmi.BootDeviceBios
 		case "rfloppy":
-			log.Info("Setting Boot Target -> RFLOPPY")
 			target = ipmi.BootDeviceRemoteFloppy
 		case "rprimary":
-			log.Info("Setting Boot Target -> RPRIMARY")
 			target = ipmi.BootDeviceRemotePrimary
 		case "rcdrom":
-			log.Info("Setting Boot Target -> RCDROM")
 			target = ipmi.BootDeviceRemoteCdrom
 		case "rdisk":
-			log.Info("Setting Boot Target -> RDISK")
 			target = ipmi.BootDeviceRemoteDisk
 		case "floppy":
-			log.Info("Setting Boot Target -> FLOPPY")
 			target = ipmi.BootDeviceFloppy
 		default:
 			return fmt.Errorf("unsupported command for bmc boot target 'target' action: %s", cmd)
