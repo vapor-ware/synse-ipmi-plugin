@@ -3,10 +3,13 @@ package pkg
 import (
 	"fmt"
 
-	"github.com/mitchellh/mapstructure"
+	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
-	ipmi "github.com/vapor-ware/goipmi"
+	"github.com/vapor-ware/synse-ipmi-plugin/pkg/bmcs"
+	"github.com/vapor-ware/synse-ipmi-plugin/pkg/devices"
+	"github.com/vapor-ware/synse-ipmi-plugin/pkg/protocol"
 	"github.com/vapor-ware/synse-sdk/sdk/config"
+	"github.com/vapor-ware/synse-sdk/sdk/utils"
 )
 
 // deviceIdentifier defines the IPMI-specific way of uniquely identifying a device
@@ -27,89 +30,78 @@ func deviceIdentifier(data map[string]interface{}) string {
 // control for each configured BMC.
 func dynamicDeviceConfig(data map[string]interface{}) ([]*config.DeviceProto, error) {
 
-	// FIXME (etd): creating the connection and the client here are not totally
-	// necessary right now other than to validate that the Connection info is
-	// generally correct. We will need this later, e.g. when scanning the SDR
-	// for devices.
-	conn := &ipmi.Connection{}
-	if err := mapstructure.Decode(data, conn); err != nil {
+	// Create a new client for the configured BMC.
+	client, err := protocol.NewClientFromConfig(data)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"data": utils.RedactPasswords(data),
+		}).Error("[ipmi] failed to create a new client from dynamic config")
 		return nil, err
 	}
+
+	// Generate an internal ID used to reference the BMC client.
+	bmcID := uuid.New().String()
+	bmcs.Add(bmcID, client)
 
 	log.WithFields(log.Fields{
-		"interface": conn.Interface,
-		"port":      conn.Port,
-		"path":      conn.Path,
-		"host":      conn.Hostname,
-		"user":      conn.Username,
-	}).Debug("[ipmi] creating connection from dynamic config")
+		"interface": client.Interface,
+		"port":      client.Port,
+		"path":      client.Path,
+		"host":      client.Hostname,
+		"user":      client.Username,
+	}).Debug("[ipmi] created client from dynamic config")
 
-	// FIXME (etd): see the FIXME above - we do not currently use this.
-	_, err := ipmi.NewClient(conn)
-	if err != nil {
-		return nil, err
-	}
+	// FIXME (etd): The device IDs are hardcoded here incrementally. While not incorrect, it doesn't
+	// 	 feel like the best solution. Investigate alternatives to this manual definition of IDs.
 
-	// Make new power device for the BMC. This device would be akin to
-	// `ipmitool [options] chassis power ...` commands.
 	cfg := []*config.DeviceProto{
+
+		// Chassis Power Device
 		{
-			Type: "power",
+			Type:    "power",
+			Handler: devices.ChassisPower.Name,
 			Context: map[string]string{
 				"location": "chassis",
 			},
-			Handler: "chassis.power",
 			Instances: []*config.DeviceInstance{
 				{
 					Info: "BMC chassis power",
 					Data: map[string]interface{}{
-						// FIXME (etd): is there anything unique that we can use instead of hardcoding?
-						// if not, find a better way than manually specifying ids...
-						"path":      conn.Path,
-						"hostname":  conn.Hostname,
-						"port":      conn.Port,
-						"username":  conn.Username,
-						"password":  conn.Password,
-						"interface": conn.Interface,
+						"id":  "1",
+						"bmc": bmcID,
 					},
 				},
 			},
 		},
+
+		// Chassis Boot Target Device
 		{
 			Type:    "boot_target",
-			Handler: "boot_target",
+			Handler: devices.ChassisBootTarget.Name,
 			Instances: []*config.DeviceInstance{
 				{
 					Info: "BMC boot target",
 					Data: map[string]interface{}{
-						"id":        "2", // FIXME (etd): see above
-						"path":      conn.Path,
-						"hostname":  conn.Hostname,
-						"port":      conn.Port,
-						"username":  conn.Username,
-						"password":  conn.Password,
-						"interface": conn.Interface,
+						"id":  "2",
+						"bmc": bmcID,
 					},
 				},
 			},
 		},
+
+		// Chassis LED (Identify) Device
 		{
-			Type: "led",
+			Type:    "led",
+			Handler: devices.ChassisLed.Name,
 			Context: map[string]string{
 				"location": "chassis",
 			},
-			Handler: "chassis.led",
 			Instances: []*config.DeviceInstance{
 				{
 					Info: "BMC chassis identify LED",
 					Data: map[string]interface{}{
-						"id":        "3", // FIXME (etd): see above
-						"path":      conn.Path,
-						"hostname":  conn.Hostname,
-						"port":      conn.Port,
-						"username":  conn.Username,
-						"password":  conn.Password,
-						"interface": conn.Interface,
+						"id":  "3",
+						"bmc": bmcID,
 					},
 				},
 			},

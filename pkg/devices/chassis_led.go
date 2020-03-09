@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/vapor-ware/synse-ipmi-plugin/pkg/bmcs"
 	"github.com/vapor-ware/synse-ipmi-plugin/pkg/protocol"
 	"github.com/vapor-ware/synse-sdk/sdk"
 	"github.com/vapor-ware/synse-sdk/sdk/output"
@@ -31,7 +32,17 @@ var ChassisLed = sdk.DeviceHandler{
 
 // bmcChassisLedRead is the read handler function for bmc-chassis-led devices.
 func bmcChassisLedRead(device *sdk.Device) ([]*output.Reading, error) {
-	state, err := protocol.GetChassisIdentify(device.Data)
+	bmcID, err := bmcs.GetIDFromConfig(device.Data)
+	if err != nil {
+		return nil, err
+	}
+
+	client, err := bmcs.Get(bmcID)
+	if err != nil {
+		return nil, err
+	}
+
+	state, err := protocol.GetChassisIdentify(client)
 	if err != nil {
 		return nil, err
 	}
@@ -45,6 +56,16 @@ func bmcChassisLedRead(device *sdk.Device) ([]*output.Reading, error) {
 
 // bmcChassisLedWrite is the write handler function for bmc-chassis-led devices.
 func bmcChassisLedWrite(device *sdk.Device, data *sdk.WriteData) error {
+	bmcID, err := bmcs.GetIDFromConfig(device.Data)
+	if err != nil {
+		return err
+	}
+
+	client, err := bmcs.Get(bmcID)
+	if err != nil {
+		return err
+	}
+
 	action := data.Action
 	raw := data.Data
 
@@ -70,7 +91,7 @@ func bmcChassisLedWrite(device *sdk.Device, data *sdk.WriteData) error {
 			return fmt.Errorf("unsupported command for bmc chassis led (identify) 'state' action: %s", cmd)
 		}
 
-		err := protocol.SetChassisIdentify(device.Data, state)
+		err := protocol.SetChassisIdentify(client, state)
 		if err != nil {
 			return err
 		}

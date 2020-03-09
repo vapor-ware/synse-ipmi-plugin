@@ -10,12 +10,7 @@ const (
 )
 
 // GetChassisPowerState gets the current state (on/off) of the chassis.
-func GetChassisPowerState(config map[string]interface{}) (string, error) {
-	client, err := newClientFromConfig(config)
-	if err != nil {
-		return "", err
-	}
-
+func GetChassisPowerState(client *ipmi.Client) (string, error) {
 	request := &ipmi.Request{
 		NetworkFunction: ipmi.NetworkFunctionChassis,
 		Command:         ipmi.CommandChassisStatus,
@@ -23,8 +18,7 @@ func GetChassisPowerState(config map[string]interface{}) (string, error) {
 	}
 	response := &ipmi.ChassisStatusResponse{}
 
-	err = client.Send(request, response)
-	if err != nil {
+	if err := client.Send(request, response); err != nil {
 		return "", err
 	}
 
@@ -41,21 +35,16 @@ func GetChassisPowerState(config map[string]interface{}) (string, error) {
 	}
 
 	log.WithFields(log.Fields{
-		"state":  state,
+		"state": state,
 	}).Debug("[ipmi] got chassis power state")
 
 	return state, nil
 }
 
 // SetChassisPowerState sets the state of the chassis.
-func SetChassisPowerState(config map[string]interface{}, control ipmi.ChassisControl) error {
-	client, err := newClientFromConfig(config)
-	if err != nil {
-		return err
-	}
-
+func SetChassisPowerState(client *ipmi.Client, control ipmi.ChassisControl) error {
 	log.WithFields(log.Fields{
-		"state":  control.String(),
+		"state": control.String(),
 	}).Info("[ipmi] setting chassis power state")
 	return client.Control(control)
 }

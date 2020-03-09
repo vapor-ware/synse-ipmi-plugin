@@ -6,6 +6,7 @@ import (
 
 	log "github.com/sirupsen/logrus"
 	ipmi "github.com/vapor-ware/goipmi"
+	"github.com/vapor-ware/synse-ipmi-plugin/pkg/bmcs"
 	"github.com/vapor-ware/synse-ipmi-plugin/pkg/protocol"
 	"github.com/vapor-ware/synse-sdk/sdk"
 	"github.com/vapor-ware/synse-sdk/sdk/output"
@@ -24,7 +25,17 @@ var ChassisBootTarget = sdk.DeviceHandler{
 
 // bmcBootTargetRead is the read handler function for bmc-boot-target devices.
 func bmcBootTargetRead(device *sdk.Device) ([]*output.Reading, error) {
-	target, err := protocol.GetChassisBootTarget(device.Data)
+	bmcID, err := bmcs.GetIDFromConfig(device.Data)
+	if err != nil {
+		return nil, err
+	}
+
+	client, err := bmcs.Get(bmcID)
+	if err != nil {
+		return nil, err
+	}
+
+	target, err := protocol.GetChassisBootTarget(client)
 	if err != nil {
 		return nil, err
 	}
@@ -38,6 +49,16 @@ func bmcBootTargetRead(device *sdk.Device) ([]*output.Reading, error) {
 
 // bmcBootTargetWrite is the write handler function for bmc-boot-target devices.
 func bmcBootTargetWrite(device *sdk.Device, data *sdk.WriteData) error {
+	bmcID, err := bmcs.GetIDFromConfig(device.Data)
+	if err != nil {
+		return err
+	}
+
+	client, err := bmcs.Get(bmcID)
+	if err != nil {
+		return err
+	}
+
 	action := data.Action
 	raw := data.Data
 
@@ -86,7 +107,7 @@ func bmcBootTargetWrite(device *sdk.Device, data *sdk.WriteData) error {
 			return fmt.Errorf("unsupported command for bmc boot target 'target' action: %s", cmd)
 		}
 
-		err := protocol.SetChassisBootTarget(device.Data, target)
+		err := protocol.SetChassisBootTarget(client, target)
 		if err != nil {
 			return err
 		}
