@@ -83,12 +83,7 @@ func Identify(c *ipmi.Client, time int) error {
 }
 
 // GetChassisIdentify gets the current identify state from the chassis.
-func GetChassisIdentify(config map[string]interface{}) (string, error) {
-	client, err := newClientFromConfig(config)
-	if err != nil {
-		return "", err
-	}
-
+func GetChassisIdentify(client *ipmi.Client) (string, error) {
 	request := &ipmi.Request{
 		NetworkFunction: ipmi.NetworkFunctionChassis,
 		Command:         ipmi.CommandChassisStatus,
@@ -96,8 +91,7 @@ func GetChassisIdentify(config map[string]interface{}) (string, error) {
 	}
 	response := &ipmi.ChassisStatusResponse{}
 
-	err = client.Send(request, response)
-	if err != nil {
+	if err := client.Send(request, response); err != nil {
 		return "", err
 	}
 
@@ -121,16 +115,11 @@ func GetChassisIdentify(config map[string]interface{}) (string, error) {
 		return "", fmt.Errorf("unsupported identify state: %v", identifyState)
 	}
 
-	return state, err
+	return state, nil
 }
 
 // SetChassisIdentify sets the identify state of the chassis
-func SetChassisIdentify(config map[string]interface{}, state IdentifyState) error {
-	client, err := newClientFromConfig(config)
-	if err != nil {
-		return err
-	}
-
+func SetChassisIdentify(client *ipmi.Client, state IdentifyState) error {
 	var time int
 	switch state {
 	case IdentifyOn:
