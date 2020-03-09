@@ -5,9 +5,9 @@ import (
 	ipmi "github.com/vapor-ware/goipmi"
 )
 
-// newClientFromConfig is a utility function to create a new IPMI client
+// NewClientFromConfig is a utility function to create a new IPMI client
 // using the configuration specified in a Device's Data field.
-func newClientFromConfig(config map[string]interface{}) (*ipmi.Client, error) {
+func NewClientFromConfig(config map[string]interface{}) (*ipmi.Client, error) {
 	conn := &ipmi.Connection{}
 
 	if err := mapstructure.Decode(config, conn); err != nil {

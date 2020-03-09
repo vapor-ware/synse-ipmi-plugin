@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	ipmi "github.com/vapor-ware/goipmi"
+	"github.com/vapor-ware/synse-ipmi-plugin/pkg/bmcs"
 	"github.com/vapor-ware/synse-ipmi-plugin/pkg/protocol"
 	"github.com/vapor-ware/synse-sdk/sdk"
 	"github.com/vapor-ware/synse-sdk/sdk/output"
@@ -23,7 +24,17 @@ var ChassisPower = sdk.DeviceHandler{
 
 // bmcPowerRead is the read handler function for bmc-power devices.
 func bmcPowerRead(device *sdk.Device) ([]*output.Reading, error) {
-	state, err := protocol.GetChassisPowerState(device.Data)
+	bmcID, err := bmcs.GetIDFromConfig(device.Data)
+	if err != nil {
+		return nil, err
+	}
+
+	client, err := bmcs.Get(bmcID)
+	if err != nil {
+		return nil, err
+	}
+
+	state, err := protocol.GetChassisPowerState(client)
 	if err != nil {
 		return nil, err
 	}
@@ -37,6 +48,16 @@ func bmcPowerRead(device *sdk.Device) ([]*output.Reading, error) {
 
 // bmcPowerWrite is the write handler function for bmc-power devices.
 func bmcPowerWrite(device *sdk.Device, data *sdk.WriteData) error {
+	bmcID, err := bmcs.GetIDFromConfig(device.Data)
+	if err != nil {
+		return err
+	}
+
+	client, err := bmcs.Get(bmcID)
+	if err != nil {
+		return err
+	}
+
 	action := data.Action
 	raw := data.Data
 
@@ -63,7 +84,7 @@ func bmcPowerWrite(device *sdk.Device, data *sdk.WriteData) error {
 			return fmt.Errorf("unsupported command for bmc power 'state' action: %s", cmd)
 		}
 
-		err := protocol.SetChassisPowerState(device.Data, state)
+		err := protocol.SetChassisPowerState(client, state)
 		if err != nil {
 			return err
 		}
