@@ -155,6 +155,21 @@ areas that affect this plugin.
   device. It may not always be clear what values to use for the `rack` and `board` ids.
   This plugin uses `ipmi` as the rack id, and the BMC host as the `board`.
 
+## Debugging
+
+A [development/debug Dockerfile](Dockerfile.dev) is provided in the project repository to enable
+building image which may be useful when developing or debugging a plugin. The development image
+uses an ubuntu base, bringing with it all the standard command line  tools one would expect.
+To build a development image:
+
+```
+make docker-dev
+```
+
+The built image will be tagged using the format `dev-{COMMIT}`, where `COMMIT` is the short commit for
+the repository at the time. This image is not published as part of the CI pipeline, but those with access
+to the Docker Hub repo may publish manually.
+
 ## Feedback
 Feedback for this plugin, or any component of the Synse ecosystem, is greatly appreciated!
 If you experience any issues, find the documentation unclear, have requests for features,
