@@ -137,6 +137,15 @@ tested against the following hardware:
 If you have tested this on other hardware and found it to work, let us know! Open a PR
 and add to the list.
 
+## Compatibility
+
+Below is a table describing the compatibility of plugin versions with Synse platform versions.
+
+|             | Synse v2 | Synse v3 |
+| ----------- | -------- | -------- |
+| plugin v1.x | ✓        | ✗        |
+| plugin v2.x | ✗        | ✓        |
+
 ## Troubleshooting
 
 ### Debugging
