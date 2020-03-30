@@ -3,7 +3,7 @@
 #
 
 PLUGIN_NAME    := ipmi
-PLUGIN_VERSION := 0.2.0-alpha
+PLUGIN_VERSION := 1.0.0
 IMAGE_NAME     := vaporio/ipmi-plugin
 
 GIT_COMMIT ?= $(shell git rev-parse --short HEAD 2> /dev/null || true)
