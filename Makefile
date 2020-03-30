@@ -3,7 +3,7 @@
 #
 
 PLUGIN_NAME    := ipmi
-PLUGIN_VERSION := 3.0.0-alpha.1
+PLUGIN_VERSION := 2.0.0
 IMAGE_NAME     := vaporio/ipmi-plugin
 BIN_NAME       := synse-ipmi-plugin
 
