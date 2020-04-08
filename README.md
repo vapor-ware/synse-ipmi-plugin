@@ -55,7 +55,7 @@ Cooling/Fan Fault    : false
 
 ## Plugin Configuration
 
-Plugin and device configuration are described in detail in the [SDK Configuration Documentation][sdk-config-docs].
+Plugin and device configuration are described in detail in the [SDK Documentation][sdk-docs].
 
 When deploying, you will need to provide your own plugin configuration (`config.yaml`)
 with dynamic configuration defined. This is how the IPMI plugin knows about which BMCs
@@ -98,7 +98,7 @@ If no default is specified (`-`), the field is required.
 Outputs are referenced by name. A single device may have more than one instance
 of an output type. A value of `-` in the table below indicates that there is no value
 set for that field. The *built-in* section describes outputs this plugin uses which are [built-in to
-the SDK](https://github.com/vapor-ware/synse-sdk/blob/v3/staging/sdk/output/builtins.go).
+the SDK](https://synse.readthedocs.io/en/latest/sdk/concepts/reading_outputs/#built-ins).
 
 **Built-in**
 
@@ -200,6 +200,5 @@ The Synse IPMI Plugin is licensed under GPLv3. See [LICENSE](LICENSE) for more i
 [synse-server]: https://github.com/vapor-ware/synse-server
 [synse-sdk]: https://github.com/vapor-ware/synse-sdk
 [synse-cli]: https://github.com/vapor-ware/synse-cli
-[plugin-dockerhub]: https://hub.docker.com/r/vaporio/ipmi-plugin
 [plugin-release]: https://github.com/vapor-ware/synse-ipmi-plugin/releases
-[sdk-config-docs]: http://synse-sdk.readthedocs.io/en/latest/user/configuration.html
+[sdk-docs]: https://synse.readthedocs.io/en/latest/sdk/intro/
