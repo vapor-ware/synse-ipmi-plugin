@@ -1,71 +1,15 @@
 #!/usr/bin/env groovy
 
-pipeline {
+// Include this shared CI repository to load script helpers and libraries.
+library identifier: 'vapor@1.0.0-RC13', retriever: modernSCM([
+  $class: 'GitSCMSource',
+  remote: 'https://github.com/vapor-ware/ci-shared.git',
+  credentialsId: 'vio-bot-gh',
+])
 
-  agent {
-    label 'golang-alpha'
-  }
 
-  environment {
-    IMAGE_NAME = 'vaporio/ipmi-plugin'
-  }
-
-  stages {
-    stage('Checkout') {
-      steps {
-        checkout scm
-      }
-    }
-
-    stage('Checks') {
-      parallel {
-
-        stage('Lint') {
-          steps {
-            container('golang') {
-              sh 'golint -set_exit_status ./pkg/...'
-            }
-          }
-        }
-
-        stage('Snapshot Build') {
-          steps {
-            container('golang') {
-              sh 'goreleaser release --debug --snapshot --skip-publish --rm-dist'
-            }
-          }
-        }
-      }
-    }
-
-    stage('Publish Latest') {
-      when {
-        branch 'master'
-      }
-      steps {
-        container('golang') {
-          withDockerRegistry(registry: [credentialsId: 'vio-docker-hub']) {
-            sh 'docker push ${IMAGE_NAME}:latest'
-          }
-        }
-      }
-    }
-
-    stage('Tagged Release') {
-      when {
-        buildingTag()
-      }
-      environment {
-        GITHUB_TOKEN = credentials('vio-bot-gh-token')
-      }
-      steps {
-        container('golang') {
-          withDockerRegistry(registry: [credentialsId: 'vio-docker-hub']) {
-            sh 'goreleaser release --debug --rm-dist'
-          }
-        }
-      }
-    }
-
-  }
-}
+golangPipeline([
+  'image': 'vaporio/ipmi-plugin',
+  'skipTest': true,
+  'skipIntegrationTest': true,
+])
