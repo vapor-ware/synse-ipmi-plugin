@@ -10,6 +10,8 @@ library identifier: 'vapor@1.19.7', retriever: modernSCM([
 
 golangPipeline([
   'image': 'vaporio/ipmi-plugin',
-  'skipTest': true,
+  'skipSetup': true,
+  'skipUnitTest': true,
   'skipIntegrationTest': true,
+  'goVersion': '1.16',
 ])
