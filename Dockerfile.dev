@@ -7,7 +7,7 @@
 # to exec into a contain and dig into whatever may be going on inside.
 #
 
-FROM vaporio/foundation:bionic
+FROM docker.io/vaporio/foundation:bionic
 
 WORKDIR /synse
 
