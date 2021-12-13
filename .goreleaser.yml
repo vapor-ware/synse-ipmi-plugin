@@ -33,13 +33,11 @@ dockers:
   -
     goos: linux
     goarch: amd64
-    binaries:
-      - synse-ipmi-plugin
     image_templates:
-      - vaporio/ipmi-plugin:{{ .Tag }}
-      - vaporio/ipmi-plugin:{{ .Major }}
-      - vaporio/ipmi-plugin:{{ .Major }}.{{ .Minor }}
-      - vaporio/ipmi-plugin:latest
+      - docker.io/vaporio/ipmi-plugin:{{ .Tag }}
+      - docker.io/vaporio/ipmi-plugin:{{ .Major }}
+      - docker.io/vaporio/ipmi-plugin:{{ .Major }}.{{ .Minor }}
+      - docker.io/vaporio/ipmi-plugin:latest
     build_flag_templates:
       - "--label=org.label-schema.version={{ .Version }}"
       - "--label=org.label-schema.build-date={{ .Date }}"
